@@ -1,0 +1,248 @@
+<div id="waterWrap"><canvas id="water" aria-hidden="true"></canvas></div>
+<div class="tword" id="tword" aria-hidden="true">La Avenida</div>
+
+<header class="topbar">
+    <button class="brand" data-go="inicio">
+      <img src="/logo.svg" alt="" width="76" height="76">
+      <span class="brand-name"><b>La Avenida</b><small>Club de autolavado</small></span>
+    </button>
+    <div class="nav">
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="menu">Menú</button>
+    <nav class="menu" id="menu" aria-label="Principal">
+      <button data-go="inicio" data-nav="inicio">Inicio</button>
+      <div class="dd">
+        <button aria-haspopup="true" data-nav="servicios">Servicios</button>
+        <div class="dd-panel">
+          <button data-go="lavados"><b>Lavados</b><small>Express, Completo, Deluxe y precios especiales</small></button>
+          <button data-go="adicionales"><b>Adicionales</b><small>15 servicios de detallado, interiores y ceras</small></button>
+        </div>
+      </div>
+      <button data-go="inicio" data-scroll="nosotros">Quiénes somos</button>
+      <button data-go="inicio" data-scroll="info">Horarios y ubicación</button>
+      <button data-go="inicio" data-scroll="faq">Preguntas</button>
+      <button class="btn btn--main btn--sm" data-go="inicio" data-scroll="contacto"><span>Contacto</span></button>
+    </nav>
+    </div>
+</header>
+
+<!-- ============ INICIO ============ -->
+<main class="page" data-view="inicio">
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-kicker">Club de autolavado</div>
+      <h1>Tu auto<br>como nuevo</h1>
+      <div class="hero-row">
+        <p>Lo lavamos a mano y lo secamos con microfibra, con calma y sin rayones. En Campestre, desde 2022.</p>
+        <div class="cta">
+          <button class="btn btn--main" data-go="lavados"><span>Ver lavados</span></button>
+          <button class="btn btn--line" data-go="adicionales"><span>Servicios adicionales</span></button>
+        </div>
+      </div>
+      <div class="facts glass">
+        <div><b>Express desde $100</b><span>Lavado exterior, rines y secado a mano</span></div>
+        <div><b>Happy Hour de 2 a 5</b><span>Express para sedán y SUV mediano a $100</span></div>
+        <div><b>Uber Special</b><span>Precio especial con tu comprobante vigente</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="washrun" id="washrun" aria-label="El lavado paso a paso">
+    <div class="stage">
+      <div id="car3d" data-model="/ferrari.json" data-shadow="/ferrari_ao.png"><img class="poster" src="/poster.png" alt="Deportivo rojo recién lavado en el estudio"></div>
+      <div class="scrim"></div>
+      <div class="wrap caps">
+        <div class="cap on"><h2>Llega como llegue</h2><p>Polvo del camino, lluvia de ayer, lodo en los rines. Así entra.</p></div>
+        <div class="cap"><h2>Prelavado</h2><p>Agua a presión para aflojar la suciedad antes de tocar la pintura.</p></div>
+        <div class="cap"><h2>Espuma</h2><p>Espuma sobre toda la carrocería y esponja a mano, panel por panel.</p></div>
+        <div class="cap"><h2>Enjuague</h2><p>El agua se lleva la espuma y, con ella, todo lo demás.</p></div>
+        <div class="cap"><h2>Secado a mano</h2><p>Toallas de microfibra, a mano, hasta que no queda una gota.</p></div>
+        <div class="cap"><h2>Brillo en llantas</h2><p>Abrillantador rociado y extendido a mano en cada llanta. Listo para rodar.</p>
+          <div class="cta"><button class="btn btn--main" data-go="lavados"><span>Ver lavados y precios</span></button><button class="btn btn--line" data-go="adicionales"><span>Adicionales</span></button></div></div>
+      </div>
+      <div></div>
+      <div class="wrap"><div class="rail" id="rail"><span class="on">Llegada</span><span>Prelavado</span><span>Espuma</span><span>Enjuague</span><span>Secado</span><span>Llantas</span></div></div>
+    </div>
+  </section>
+
+  <div class="solid">
+    <section class="band" id="servicios"><div class="wrap">
+      <div class="head">
+        <h2>Servicios</h2>
+        <p class="lead">Elige un lavado según lo que necesite tu vehículo y súmale los servicios adicionales que quieras.</p>
+      </div>
+      <div class="panels">
+        <button class="panel panel--deep" data-go="lavados">
+          <h3>Lavados</h3><div style="display:grid;gap:26px">
+          <ul>
+            <li><span>Express</span><span>desde $100</span></li>
+            <li><span>Completo</span><span>desde $190</span></li>
+            <li><span>Deluxe</span><span>desde $340</span></li>
+            <li><span>Uber Special y Happy Hour</span><span>desde $100</span></li>
+          </ul><div class="panel-top"><span>Ver los cinco lavados</span><span class="arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></div>
+        </button>
+        <button class="panel panel--pale" data-go="adicionales">
+          <h3>Adicionales</h3><div style="display:grid;gap:26px">
+          <ul>
+            <li><span>Motor, pintura, rines y faros</span><span>desde $200</span></li>
+            <li><span>Vidrios y cristales</span><span>desde $220</span></li>
+            <li><span>Shampoo de interiores</span><span>desde $100</span></li>
+            <li><span>Ceras</span><span>desde $150</span></li>
+          </ul><div class="panel-top"><span>Ver los quince servicios</span><span class="arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></div>
+        </button>
+      </div>
+    </div></section>
+
+    <section class="band"><div class="wrap">
+      <div class="head">
+        <h2>El Express, según tu vehículo</h2>
+        <p class="lead">Lavado exterior, rines, plásticos básicos y secado a mano con toallas de microfibra. Toca tu tipo de vehículo para ver todos los precios.</p>
+      </div>
+      <div class="sizes" id="sizes"></div>
+    </div></section>
+
+    <section class="band"><div class="wrap">
+      <div class="head"><h2>Precios especiales</h2><p class="lead">Dos maneras de pagar menos por tu lavado.</p></div>
+      <div class="promos">
+        <article class="promo promo--water"><div class="drops"></div>
+          <h3>Happy Hour Express</h3>
+          <p>El lavado Express a precio reducido. Aplica solo en el horario de 2 a 5.</p>
+          <div class="promo-foot"><div class="num" data-prices="[null,100,100,120,150]"></div><small data-veh></small></div>
+        </article>
+        <article class="promo">
+          <h3>Uber Special</h3>
+          <p>Para conductores de plataforma. Válido únicamente presentando comprobante vigente.</p>
+          <div class="promo-foot"><div class="num" data-prices="[null,120,160,170,200]"></div><small data-veh></small></div>
+        </article>
+      </div>
+    </div></section>
+
+    <section class="band" id="nosotros"><div class="wrap">
+      <div class="about">
+        <div style="display:grid;gap:28px">
+          <h2>Quiénes somos</h2>
+          <p class="say">Un club para quienes cuidan su auto. Lavamos a mano, secamos con microfibra y cobramos lo que dice la lista.</p>
+          <p class="lead">Club de Autolavado La Avenida abrió en Campestre, Yucatán, en 2022. Atendemos motos, autos, camionetas y SUV de todos los tamaños, del lavado rápido de diario al detallado completo de interiores y pintura.</p>
+        </div>
+        <div class="year"><b>2022</b><span>Desde entonces en Campestre, Yucatán</span></div>
+      </div>
+      <div class="vals">
+        <div><b>A mano</b><span>Cada vehículo se lava y se seca a mano, sin rodillos que rayen la pintura.</span></div>
+        <div><b>Microfibra</b><span>Secamos con toallas de microfibra para no dejar marcas ni pelusa.</span></div>
+        <div><b>Precio claro</b><span>Cinco tamaños de vehículo y un precio fijo para cada servicio.</span></div>
+      </div>
+    </div></section>
+
+    <section class="band" id="info"><div class="wrap">
+      <div class="head"><h2>Horarios y ubicación</h2><p class="lead">Estamos en Campestre, Yucatán. Abrimos de lunes a sábado. El Happy Hour aplica de 2 a 5.</p></div>
+      <div class="info">
+        <div style="display:grid;gap:10px">
+          <div class="hrs">
+            <div><b>Lunes a sábado</b><span>8:00 a 5:00</span></div>
+            <div><b>Domingo</b><span>Cerrado</span></div>
+            <div><b>Happy Hour Express</b><span class="hh">2:00 a 5:00</span></div>
+          </div>
+          <div class="infocols">
+            <div><b>Formas de pago</b><span>Por confirmar</span></div>
+            <div><b>Cómo llegar</b><span>Referencias por confirmar</span></div>
+          </div>
+        </div>
+        <div class="map"><span class="pin"></span>
+          <div class="map-tag glass"><b>La Avenida</b><span>Campestre, Yucatán. Aquí va el mapa de Google con la dirección exacta.</span></div>
+        </div>
+      </div>
+    </div></section>
+
+    <section class="band" id="faq"><div class="wrap faq">
+      <div class="faq-head"><h2>Preguntas frecuentes</h2><p class="lead">Lo que más nos preguntan antes de venir.</p></div>
+      <div class="qs" id="qs"></div>
+    </div></section>
+
+    <section class="contact" id="contacto"><div class="wrap">
+      <div>
+        <h2>Hablemos</h2>
+        <p class="lead" style="margin-top:20px">Pregunta por un servicio, pide una cotización de detallado o aparta tu lugar.</p>
+        <div class="chan">
+          <div><span>WhatsApp</span><b><a href="https://wa.me/529993394611" target="_blank" rel="noopener noreferrer">999 339 4611</a></b></div>
+          <div><span>Teléfono</span><b>Por confirmar</b></div>
+          <div><span>Instagram</span><b>Por confirmar</b></div>
+          <div><span>Dirección</span><b>Campestre, Yucatán</b></div>
+        </div>
+      </div>
+      <form class="form" id="cform" novalidate>
+        <div class="two">
+          <label for="c-nombre">Nombre<input id="c-nombre" type="text" autocomplete="name" placeholder="Tu nombre"></label>
+          <label for="c-tel">Teléfono<input id="c-tel" type="tel" autocomplete="tel" placeholder="10 dígitos"></label>
+        </div>
+        <div class="two">
+          <label for="c-veh">Vehículo<select id="c-veh"><option>Moto</option><option selected>Sedán / auto pequeño</option><option>SUV mediano / camioneta</option><option>SUV grande / camioneta</option><option>XL SUV / camioneta</option></select></label>
+          <label for="c-serv">Servicio<select id="c-serv"><option>Express</option><option selected>Completo</option><option>Deluxe</option><option>Servicios adicionales</option><option>Otro</option></select></label>
+        </div>
+        <label for="c-msg">Mensaje<textarea id="c-msg" placeholder="Cuéntanos qué necesita tu vehículo"></textarea></label>
+        <button class="btn btn--main" type="submit"><span>Enviar por WhatsApp</span></button>
+      </form>
+    </div></section>
+  </div>
+</main>
+
+<!-- ============ LAVADOS ============ -->
+<main class="page" data-view="lavados" hidden>
+  <section class="sub"><div class="wrap">
+    <div class="crumb"><button data-go="inicio">Inicio</button><span>/</span><span>Servicios</span><span>/</span><span>Lavados</span></div>
+    <h1>Lavados</h1>
+    <p>Cinco opciones. Elige tu tipo de vehículo y los precios se ajustan.</p>
+  </div></section>
+  <div class="solid">
+    <div class="vehbar"><div class="wrap"><label>Tu vehículo</label><div class="seg" data-seg="5" role="group" aria-label="Tipo de vehículo"></div></div></div>
+    <section class="band"><div class="wrap">
+      <div class="group-title"><h2>Los tres lavados</h2><span data-veh></span></div>
+      <div id="washes"></div>
+    </div></section>
+    <section class="band"><div class="wrap">
+      <div class="group-title"><h2>Precios especiales</h2><span data-veh></span></div>
+      <div id="specials"></div>
+    </div></section>
+    <section class="band"><div class="wrap">
+      <div class="head"><h2>Qué incluye cada uno</h2><p class="lead">El Completo suma interiores al Express. El Deluxe suma cera líquida al Completo.</p></div>
+      <div class="tbl"><table class="matrix"><thead><tr><th></th><th>Express</th><th>Completo</th><th>Deluxe</th></tr></thead><tbody id="matrix"></tbody></table></div>
+    </div></section>
+    <section class="band"><div class="wrap">
+      <div class="head"><h2>Todos los precios</h2><p class="lead">Precios en pesos mexicanos. La moto solo aplica para el lavado Express.</p></div>
+      <div class="tbl"><table id="alltbl"></table></div>
+    </div></section>
+    <section class="band"><div class="wrap next">
+      <h2>Súmale algo más</h2>
+      <button class="btn btn--main" data-go="adicionales"><span>Ver servicios adicionales</span></button>
+    </div></section>
+  </div>
+</main>
+
+<!-- ============ ADICIONALES ============ -->
+<main class="page" data-view="adicionales" hidden>
+  <section class="sub"><div class="wrap">
+    <div class="crumb"><button data-go="inicio">Inicio</button><span>/</span><span>Servicios</span><span>/</span><span>Adicionales</span></div>
+    <h1>Adicionales</h1>
+    <p>Quince servicios de detallado. Marca los que quieras y ve sumando el total.</p>
+  </div></section>
+  <div class="solid">
+    <div class="vehbar"><div class="wrap"><label>Tu vehículo</label><div class="seg" data-seg="4" role="group" aria-label="Tipo de vehículo"></div></div></div>
+    <div class="wrap" id="cats"></div>
+    <section class="band"><div class="wrap next">
+      <h2>¿Aún no eliges lavado?</h2>
+      <button class="btn btn--main" data-go="lavados"><span>Ver lavados</span></button>
+    </div></section>
+  </div>
+</main>
+
+<footer><div class="wrap">
+  <img class="foot-logo" src="/logo.svg" alt="Club de Autolavado La Avenida" width="96" height="96">
+  <b>La Avenida</b>
+  <nav class="foot-nav" aria-label="Pie"><button data-go="inicio">Inicio</button><button data-go="lavados">Lavados</button><button data-go="adicionales">Adicionales</button><button data-go="inicio" data-scroll="nosotros">Quiénes somos</button><button data-go="inicio" data-scroll="info">Horarios y ubicación</button><button data-go="inicio" data-scroll="faq">Preguntas</button><button data-go="inicio" data-scroll="contacto">Contacto</button></nav>
+  <div><span>Club de Autolavado La Avenida. Campestre, Yucatán. Est. 2022.</span><span>Maqueta de diseño para revisión. Modelo 3D: Ferrari 458 Italia, por vicent091036 (Sketchfab), distribuido con three.js.</span></div>
+</div></footer>
+
+<div class="bar" id="bar"><div class="bar-in">
+  <div class="bar-txt"><b id="bar-title"></b><span id="bar-sub"></span></div>
+  <div class="num" id="bar-total"></div>
+  <button class="btn btn--sm" id="bar-send"><span>Pedir por WhatsApp</span></button>
+  <button class="clear" id="bar-clear">Quitar todo</button>
+</div></div>

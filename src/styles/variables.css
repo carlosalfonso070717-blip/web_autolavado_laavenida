@@ -1,0 +1,26 @@
+:root {
+  --bg: #f3f8fb;
+  --paper: #ffffff;
+  --tint: #e2f0f8;
+  --line: #c6dcea;
+  --ink: #08263f;
+  --muted: #4b687e;
+  --water: #1277c2;
+  --on-water: #ffffff;
+  --aqua: #63bdec;
+  --deep: #0a3050;
+  --on-deep: #eaf5fc;
+  --on-deep-muted: #a3c8df;
+  --deep-line: #245a82;
+  --w-lo: #93cff0;
+  --w-hi: #dff3fd;
+  --glass: rgba(255, 255, 255, 0.62);
+  --glass-line: rgba(255, 255, 255, 0.9);
+  --shadow: 0 30px 70px -40px rgba(8, 38, 63, 0.55);
+  --display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+  --body: 'Onest', 'Segoe UI', system-ui, sans-serif;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --nav-h: 64px;
+  --page: clamp(16px, 4.5vw, 56px);
+  --max: 1240px;
+}

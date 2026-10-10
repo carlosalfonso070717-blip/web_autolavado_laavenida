@@ -94,21 +94,57 @@ $('#bar-send').addEventListener('click',function(){
   if(!lines.length)return;
   openWhatsApp('Hola, quiero pedir en La Avenida:\n'+lines.join('\n')+'\nVehículo: '+v.l+'\nTotal: $'+total.toLocaleString('es-MX'));
 });
-$('#burger').addEventListener('click',function(){var o=$('#menu').classList.toggle('open');this.setAttribute('aria-expanded',o)});
+function closeMenu(){$('#menu').classList.remove('open');document.body.classList.remove('nav-open');var b=$('#burger');if(b)b.setAttribute('aria-expanded','false')}
+$('#burger').addEventListener('click',function(e){
+  e.stopPropagation();
+  var o=$('#menu').classList.toggle('open');
+  document.body.classList.toggle('nav-open',o);
+  this.setAttribute('aria-expanded',o?'true':'false');
+});
+$('#social-toggle').addEventListener('click',function(e){
+  e.stopPropagation();
+  var open=$('#social').classList.toggle('open');
+  this.setAttribute('aria-expanded',open?'true':'false');
+});
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#social')){$('#social').classList.remove('open');$('#social-toggle').setAttribute('aria-expanded','false')}
+  if(!e.target.closest('.topbar'))closeMenu();
+});
 
 /* ---------- pages + water sheet transition ---------- */
 var cur='inicio',busy=false,WT={force:false},wrap=$('#waterWrap'),tw=$('#tword');
 function show(name,scrollId){
   $$('[data-view]').forEach(function(v){v.hidden=v.dataset.view!=name});
   cur=name;
-  $$('[data-nav]').forEach(function(b){var on=b.dataset.nav==name||(b.dataset.nav=='servicios'&&name!='inicio');if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
-  $('#menu').classList.remove('open');
+  closeMenu();
   if(name=='adicionales'&&S.veh==0){S.veh=1}
   update();
   var el=scrollId&&document.getElementById(scrollId);
   window.scrollTo(0,el?el.getBoundingClientRect().top+scrollY-108:0);
   try{history.replaceState(null,'','#'+name)}catch(_){}
+  placeNav();
 }
+var NAV_SECS=['servicios','nosotros','info','faq','contacto'];
+function placeNav(){
+  var id;
+  if(cur!='inicio')id='servicios';
+  else{
+    id='inicio';
+    var line=scrollY+140;
+    NAV_SECS.forEach(function(s){
+      var el=document.getElementById(s);
+      if(el&&el.getBoundingClientRect().top+scrollY<=line)id=s;
+    });
+  }
+  $$('#menu button').forEach(function(b){
+    if(b.closest('.dd-panel'))return;
+    var key=b.dataset.scroll||b.dataset.nav;
+    if(key==id)b.setAttribute('aria-current','page');
+    else b.removeAttribute('aria-current');
+  });
+}
+var navTick=0;
+window.addEventListener('scroll',function(){if(navTick)return;navTick=requestAnimationFrame(function(){navTick=0;placeNav()})},{passive:true});
 function io(k){return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2}
 /* a sheet of water with a wavy foam crest: top edge at T, bottom edge at B (fractions of the screen) */
 function sheet(T,B,ph){
@@ -132,7 +168,7 @@ function go(name,scrollId){
   phase(1.14,-.14,760,function(T,ph,k){sheet(T,1.14,ph);tw.style.opacity=Math.max(0,k*2-1)},function(){show(name,scrollId);setTimeout(uncover,140)});
 }
 var h=(location.hash||'').slice(1);
-if(h=='lavados'||h=='adicionales')show(h);else update();
+if(h=='lavados'||h=='adicionales')show(h);else{update();placeNav()}
 tw.style.opacity=0;
 wrap.classList.remove('over');
 wrap.style.clipPath='';
@@ -149,12 +185,29 @@ var FAQ=[
  ['¿Puedo agregar servicios adicionales a cualquier lavado?','Sí. En la página de adicionales puedes marcar los que quieras y ver el total según tu vehículo antes de pedirlo.']];
 $('#qs').innerHTML=FAQ.map(function(q,i){return '<div class="qa"><button class="q" id="q'+i+'" aria-expanded="'+(i==0)+'" aria-controls="a'+i+'"><span>'+q[0]+'</span><i></i></button><div class="a" id="a'+i+'" role="region" aria-labelledby="q'+i+'"><div><p>'+q[1]+'</p></div></div></div>'}).join('');
 $('#qs').addEventListener('click',function(e){var b=e.target.closest('.q');if(b)b.setAttribute('aria-expanded',b.getAttribute('aria-expanded')!='true')});
+function contactReady(){
+  var nombre=$('#c-nombre').value.trim();
+  var tel=$('#c-tel').value.replace(/\D/g,'');
+  var veh=$('#c-veh').value;
+  var serv=$('#c-serv').value;
+  var msg=$('#c-msg').value.trim();
+  var ok=nombre.length>1&&tel.length===10&&veh&&serv&&msg.length>0;
+  $('#cform button[type="submit"]').disabled=!ok;
+  return ok;
+}
+$('#cform').addEventListener('input',contactReady);
+$('#cform').addEventListener('change',contactReady);
 $('#cform').addEventListener('submit',function(e){
   e.preventDefault();
-  var nombre=$('#c-nombre').value.trim()||'un cliente';
-  var tel=$('#c-tel').value.trim()||'no indicado';
-  var msg=$('#c-msg').value.trim()||'sin mensaje';
-  openWhatsApp('Hola, soy '+nombre+'.\nTeléfono: '+tel+'\nVehículo: '+$('#c-veh').value+'\nServicio: '+$('#c-serv').value+'\nMensaje: '+msg);
+  var fields=[$('#c-nombre'),$('#c-tel'),$('#c-veh'),$('#c-serv'),$('#c-msg')];
+  var tel=$('#c-tel').value.replace(/\D/g,'');
+  fields.forEach(function(f){
+    var bad=f===$('#c-tel')?tel.length!==10:!f.value.trim();
+    f.classList.toggle('is-invalid',bad);
+  });
+  $('#cform-note').hidden=contactReady();
+  if(!contactReady())return;
+  openWhatsApp('Hola, soy '+$('#c-nombre').value.trim()+'.\nTeléfono: '+tel+'\nVehículo: '+$('#c-veh').value+'\nServicio: '+$('#c-serv').value+'\nMensaje: '+$('#c-msg').value.trim());
 });
 
 /* ---------- sunlit water (WebGL) ---------- */

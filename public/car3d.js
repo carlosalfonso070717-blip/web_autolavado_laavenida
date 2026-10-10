@@ -93,14 +93,13 @@ function buildRoof(){
   for(ei=0;ei<nE;ei++){var e=edge[ei];lp.push(e[1],e[2],e[0],e[1]+.008,e[2]-.034,e[0],-e[1],e[2],e[0],-(e[1]+.008),e[2]-.034,e[0])}
   for(ei=0;ei<nE-1;ei++){var a=ei*4,b=a+4;li.push(a,b,a+1,a+1,b,b+1,a+2,a+3,b+2,a+3,b+3,b+2)}
   var lipG=new T.BufferGeometry();lipG.setAttribute('position',new T.Float32BufferAttribute(lp,3));lipG.setIndex(li);lipG.computeVertexNormals();
-  /* door aperture measured on the body: open from z -0.36 to 0.34, sill on the belt, header on the roof */
+  /* the opening is slanted: the belt runs z -0.38 to 0.36, the header reaches the A-pillar (z -0.64) and the rear pillar (z 0.56) */
   var wp=[],wi=[],NS2=48,side,zA=edge[0][0];
-  for(side=-1;side<=1;side+=2)for(i=0;i<=NS2;i++){var z2=-.36+.70*i/NS2,b2=lerpTab(belt,z2),tx,ty;
-    if(z2<zA){var tp=lerpTab(pill,z2);tx=tp[1];ty=tp[2]}
-    else{var ed=lerpTab(edge,Math.min(z2,edge[nE-1][0]));tx=ed[1];ty=ed[2]}
-    tx-=.004;ty-=.003;var by=Math.min(b2[2],.84+.12*Math.max(0,z2+.2))-.01;
-    if(ty<by+.06)ty=by+.06;
-    wp.push(side*(b2[1]-.006),by,z2,side*tx,ty,z2)}
+  for(side=-1;side<=1;side+=2)for(i=0;i<=NS2;i++){var k=i/NS2,zb=-.38+.74*k,zt=-.64+1.2*k,b2=lerpTab(belt,zb),tx,ty;
+    if(zt<zA){var tp=lerpTab(pill,zt);tx=tp[1];ty=tp[2]}
+    else{var ed=lerpTab(edge,Math.min(zt,edge[nE-1][0]));tx=ed[1];ty=ed[2]}
+    tx-=.004;ty-=.004;var by=b2[2]-.012;if(ty<by+.05)ty=by+.05;
+    wp.push(side*(b2[1]-.008),by,zb,side*tx,ty,zt)}
   for(side=0;side<2;side++)for(i=0;i<NS2;i++){var o=side*(NS2+1)*2+i*2;wi.push(o,o+1,o+2,o+2,o+1,o+3)}
   var wg=new T.BufferGeometry();wg.setAttribute('position',new T.Float32BufferAttribute(wp,3));wg.setIndex(wi);wg.computeVertexNormals();
   var grp=new T.Group();grp.add(roof);grp.add(new T.Mesh(lipG,roofMat));grp.add(new T.Mesh(wg,sideGlass));grp.userData.roof=roof;return grp;
@@ -247,8 +246,10 @@ function size(){var w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;rend
 function tick(now){if(!vis)return;DT=Math.min(.1,(now-last)/1000);last=now;time=(time+DT)%LOOP;clock+=DT;frame(time);raf=requestAnimationFrame(tick)}
 function play(on){if(on&&!vis&&ready&&!calm){vis=true;last=performance.now();raf=requestAnimationFrame(tick)}else if(!on){vis=false;cancelAnimationFrame(raf)}}
 window.addEventListener('resize',size);
-var seen=false;
-if('IntersectionObserver' in window)new IntersectionObserver(function(en){seen=en[0].isIntersecting;play(seen&&!document.hidden)},{threshold:.15}).observe(host);else seen=true;
+var seen=true,primed=false;
+if('IntersectionObserver' in window)new IntersectionObserver(function(en){
+  var on=en[0].isIntersecting;if(on)primed=true;seen=on||!primed;play(seen&&!document.hidden);
+},{threshold:0,rootMargin:'180px 0px'}).observe(host);
 document.addEventListener('visibilitychange',function(){play(seen&&!document.hidden)});
 /* test hooks: jump to a time, or simulate a stretch at fixed steps so trails build up; optional fixed camera */
 window.__carSeek=function(t,c){play(false);DT=1;time=t;clock=c||0;frame(t)};

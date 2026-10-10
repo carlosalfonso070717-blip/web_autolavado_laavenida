@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Grabaciones de pantalla: superan el límite de 100 MB de GitHub
+*.mov

@@ -229,10 +229,14 @@ if(gl){
     function hex(n){var v=getComputedStyle(document.documentElement).getPropertyValue(n).trim().replace('#','');if(v.length<6)return[.58,.82,.94];return [0,2,4].map(function(i){return parseInt(v.substr(i,2),16)/255})}
     function colors(){gl.uniform3fv(U.lo,hex('--w-lo'));gl.uniform3fv(U.hi,hex('--w-hi'));gl.uniform3fv(U.gt,hex('--w-glint'))}
     function size(){var s=Math.min(devicePixelRatio||1,1.5)*.6;cv.width=Math.max(2,innerWidth*s|0);cv.height=Math.max(2,innerHeight*s|0);gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(U.r,cv.width,cv.height)}
+    var washEl=document.getElementById('washrun'),carZone=false,zoneTick=0;
+    function syncZone(){if(!washEl)return;carZone=washEl.getBoundingClientRect().top<innerHeight}
     function frame(t){
-      if(scrollY<innerHeight*1.15||WT.force){mx+=(tx-mx)*.06;my+=(ty-my)*.06;gl.uniform1f(U.t,t/1000);gl.uniform2f(U.m,mx,my);gl.drawArrays(gl.TRIANGLES,0,3)}
+      if(!carZone&&(scrollY<innerHeight*.95||WT.force)){mx+=(tx-mx)*.06;my+=(ty-my)*.06;gl.uniform1f(U.t,t/1000);gl.uniform2f(U.m,mx,my);gl.drawArrays(gl.TRIANGLES,0,3)}
       if(!calm)requestAnimationFrame(frame);
     }
+    addEventListener('scroll',function(){if(zoneTick)return;zoneTick=requestAnimationFrame(function(){zoneTick=0;syncZone()})},{passive:true});
+    syncZone();
     cv.classList.add('live');
     size();colors();frame(calm?4000:0);
     addEventListener('resize',function(){size();if(calm)frame(4000)});

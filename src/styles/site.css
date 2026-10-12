@@ -342,7 +342,7 @@ footer div{display:flex;justify-content:space-between;gap:12px 32px;flex-wrap:wr
 #car3d{position:absolute;inset:0}
 #car3d canvas,#car3d .poster{position:absolute;inset:0;width:100%;height:100%;display:block}
 #car3d .poster{object-fit:cover}
-#car3d canvas{opacity:0;transition:opacity .9s}
+#car3d canvas{opacity:0;transition:opacity .35s}
 #car3d.ready .poster{opacity:0}
 .scrim{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,color-mix(in srgb,var(--st-bg) 88%,transparent),transparent 42%,transparent 78%,color-mix(in srgb,var(--st-bg) 80%,transparent))}
 .rig svg{overflow:visible}

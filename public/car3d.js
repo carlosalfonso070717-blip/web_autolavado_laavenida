@@ -2,10 +2,12 @@
 (function(){
 var host=document.getElementById('car3d');if(!host||!window.THREE)return;
 var T=THREE,calm=matchMedia('(prefers-reduced-motion: reduce)').matches,renderer;
-try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}catch(e){return}
-var run=document.getElementById('washrun'),caps=[].slice.call(run.querySelectorAll('.cap')),rail=document.getElementById('rail'),ticks=[].slice.call(rail.querySelectorAll('span'));
 var small=Math.min(window.innerWidth,window.innerHeight)<700;
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,small?1.25:1.5));
+var lite=small||matchMedia('(pointer: coarse)').matches||(navigator.hardwareConcurrency||8)<=4;
+function pixelRatio(){var dpr=window.devicePixelRatio||1,edge=Math.max(host.clientWidth,host.clientHeight,1),cap=lite?900:1500;return Math.max(.7,Math.min(dpr,cap/edge,lite?1:1.25))}
+try{renderer=new T.WebGLRenderer({antialias:!lite,powerPreference:'high-performance',alpha:false})}catch(e){return}
+var run=document.getElementById('washrun'),caps=[].slice.call(run.querySelectorAll('.cap')),rail=document.getElementById('rail'),ticks=[].slice.call(rail.querySelectorAll('span'));
+renderer.setPixelRatio(pixelRatio());
 renderer.outputEncoding=T.sRGBEncoding;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 host.appendChild(renderer.domElement);
 var BG=new T.Color(0x03121d),scene=new T.Scene();scene.background=BG;
@@ -28,7 +30,7 @@ var floor=new T.Mesh(new T.PlaneGeometry(44,44),new T.MeshBasicMaterial({map:tex
 floor.rotation.x=-Math.PI/2;floor.renderOrder=1;scene.add(floor);
 
 /* ---------- surface shader: dirt, foam, water beads, tool trails, tyre and brake detail ---------- */
-var NT=40,trail=[],ti=0;for(var i=0;i<NT;i++)trail.push(new T.Vector4(0,-9,0,0));
+var NT=lite?12:22,trail=[],ti=0;for(var i=0;i<NT;i++)trail.push(new T.Vector4(0,-9,0,0));
 var U={uDirt:{value:new T.Vector2(1,1)},uFoam:{value:new T.Vector2(0,0)},uWet:{value:new T.Vector2(0,0)},uSweep:{value:9},uLag:{value:0},uTrail:{value:trail},uTrF:{value:0},uTrW:{value:0},uGloss:{value:0},uTyre:{value:new T.Vector2(0,0)}};
 var NOISE='float h31(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}'+
  'float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}'+
@@ -128,16 +130,23 @@ gun.add(part(new T.CylinderGeometry(.016,.016,.05,14),steel,0,.005,.69,H));gun.a
 var bottle=new T.Group();bottle.add(part(new T.CylinderGeometry(.048,.05,.15,24),new T.MeshPhysicalMaterial({color:0xf4f8fb,roughness:.2,transparent:true,opacity:.88,clearcoat:1}),0,-.11,.66));
 bottle.add(part(new T.CylinderGeometry(.03,.034,.045,18),blue,0,-.018,.66));gun.add(bottle);gun.visible=false;scene.add(gun);
 gun.traverse(function(o){if(o.geometry&&o.geometry.type=='TorusGeometry')o.rotation.y=H});
-var hose=new T.Mesh(new T.BufferGeometry(),rubber);hose.renderOrder=6;hose.frustumCulled=false;hose.visible=false;scene.add(hose);
-var HP=[new T.Vector3(),new T.Vector3(),new T.Vector3(),new T.Vector3(),new T.Vector3()],hcurve=new T.CatmullRomCurve3(HP);
-function hoseStep(){HP[0].set(0,-.24,-.17).applyMatrix4(gun.matrixWorld);var g=gun.position;HP[1].set(HP[0].x+.06,Math.max(.25,HP[0].y-.45),HP[0].z+.08);HP[2].set(g.x+.3,.03,g.z+.55);HP[3].set(g.x+.9,.025,g.z+1.7);HP[4].set(g.x+1.6,.025,g.z+4.2);
-  hose.geometry.dispose();hose.geometry=new T.TubeGeometry(hcurve,26,.012,6)}
+var HP=[new T.Vector3(0,.4,-.2),new T.Vector3(.2,.2,.2),new T.Vector3(.6,.05,.8),new T.Vector3(1.2,.04,1.6),new T.Vector3(2,.03,3.2)],hcurve=new T.CatmullRomCurve3(HP);
+var hoseSeg=18,hoseRadN=5,hoseRadius=.012,hoseGeo=new T.TubeGeometry(hcurve,hoseSeg,hoseRadius,hoseRadN);
+var hose=new T.Mesh(hoseGeo,rubber);hose.renderOrder=6;hose.frustumCulled=false;hose.visible=false;scene.add(hose);
+var hoseP=new T.Vector3(),hoseNrm=new T.Vector3(),hoseVtx=new T.Vector3();
+function hoseStep(){hcurve.needsUpdate=true;HP[0].set(0,-.24,-.17).applyMatrix4(gun.matrixWorld);var g=gun.position;HP[1].set(HP[0].x+.06,Math.max(.25,HP[0].y-.45),HP[0].z+.08);HP[2].set(g.x+.3,.03,g.z+.55);HP[3].set(g.x+.9,.025,g.z+1.7);HP[4].set(g.x+1.6,.025,g.z+4.2);
+  var frames=hcurve.computeFrenetFrames(hoseSeg,false),pos=hoseGeo.attributes.position,nrm=hoseGeo.attributes.normal,i,j,v,theta,sin,cos,N,B;
+  for(i=0;i<=hoseSeg;i++){hcurve.getPointAt(i/hoseSeg,hoseP);N=frames.normals[i];B=frames.binormals[i];
+    for(j=0;j<=hoseRadN;j++){v=i*(hoseRadN+1)+j;theta=j/hoseRadN*Math.PI*2;sin=Math.sin(theta);cos=-Math.cos(theta);
+      hoseNrm.set(cos*N.x+sin*B.x,cos*N.y+sin*B.y,cos*N.z+sin*B.z).normalize();
+      hoseVtx.copy(hoseP).addScaledVector(hoseNrm,hoseRadius);pos.setXYZ(v,hoseVtx.x,hoseVtx.y,hoseVtx.z);nrm.setXYZ(v,hoseNrm.x,hoseNrm.y,hoseNrm.z)}}
+  pos.needsUpdate=true;nrm.needsUpdate=true}
 
-var NS=small?500:900,sp=new Float32Array(NS*6),sc=new Float32Array(NS*6),seed=[];
+var NS=lite?280:640,sp=new Float32Array(NS*6),sc=new Float32Array(NS*6),seed=[];
 for(i=0;i<NS;i++)seed.push({a:(Math.random()*2-1),b:(Math.random()*2-1),ph:Math.random(),v:.8+Math.random()*.6});
 var sgeo=new T.BufferGeometry();sgeo.setAttribute('position',new T.BufferAttribute(sp,3));sgeo.setAttribute('color',new T.BufferAttribute(sc,3));
 var jet=new T.LineSegments(sgeo,new T.LineBasicMaterial({vertexColors:true,transparent:true,opacity:1,depthWrite:false,blending:T.AdditiveBlending}));jet.frustumCulled=false;jet.renderOrder=7;scene.add(jet);
-var NP=small?220:420,pp=new Float32Array(NP*3),pgeo=new T.BufferGeometry();pgeo.setAttribute('position',new T.BufferAttribute(pp,3));
+var NP=lite?120:280,pp=new Float32Array(NP*3),pgeo=new T.BufferGeometry();pgeo.setAttribute('position',new T.BufferAttribute(pp,3));
 var puffMat=new T.PointsMaterial({size:.15,map:soft,transparent:true,opacity:.5,depthWrite:false,color:0xffffff});
 var puff=new T.Points(pgeo,puffMat);puff.frustumCulled=false;puff.renderOrder=7;scene.add(puff);
 var NM2=22,mistMat=new T.PointsMaterial({size:.34,map:soft,transparent:true,opacity:.1,depthWrite:false,blending:T.AdditiveBlending,color:0xd6ebf8}),mgeo=new T.BufferGeometry(),mpos=new Float32Array(NM2*3);
@@ -177,21 +186,23 @@ var NZ2=70,zp=new Float32Array(NZ2*3),zgeo=new T.BufferGeometry();zgeo.setAttrib
 var spritzMat=new T.PointsMaterial({size:.06,map:soft,transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending,color:0xcfe9fb}),spritz=new T.Points(zgeo,spritzMat);spritz.frustumCulled=false;spritz.renderOrder=7;spritz.visible=false;scene.add(spritz);
 var XAX=new T.Vector3(1,0,0);
 /* tools ride on the real bodywork: cast a ray at the body, then glide toward the hit so the motion stays fluid */
-var ray=new T.Raycaster(),bodyMesh=null,hitList=[],NM=new T.Matrix3(),ZAX=new T.Vector3(0,0,1),QN=new T.Quaternion(),QS=new T.Quaternion(),O=new T.Vector3(),DIR=new T.Vector3(),N=new T.Vector3(),DT=1;
+var ray=new T.Raycaster(),bodyMesh=null,hitList=[],NM=new T.Matrix3(),ZAX=new T.Vector3(0,0,1),QN=new T.Quaternion(),QS=new T.Quaternion(),O=new T.Vector3(),DIR=new T.Vector3(),N=new T.Vector3(),DT=1,castAcc=0,allowCast=true;
 function cast(o,d){ray.set(o,d);var h=ray.intersectObjects(hitList,false)[0];if(!h)return null;N.copy(h.face.normal);if(h.object===bodyMesh)N.applyMatrix3(NM);N.normalize();if(N.dot(d)>0)N.negate();return h}
 function ride(obj,fromTop,a,b,off,spin){
-  var ud=obj.userData;if(fromTop){O.set(a,3,b);DIR.set(0,-1,0)}else{O.set(3,a,b);DIR.set(-1,0,0)}
-  var h=hitList.length?cast(O,DIR):null;
-  if(h&&(fromTop?h.point.y>.6:h.point.x>.5)){ud.hit.copy(h.point);ud.ok=true;ud.tp.copy(h.point).addScaledVector(N,off);QN.setFromUnitVectors(ZAX,N);QS.setFromAxisAngle(ZAX,spin);ud.tq.copy(QN).multiply(QS)}
-  var k=ud.fresh||DT>=1?1:1-Math.exp(-DT*11);obj.position.lerp(ud.tp,k);obj.quaternion.slerp(ud.tq,k);ud.fresh=false;
+  var ud=obj.userData,snap=allowCast||ud.fresh;
+  if(snap){if(fromTop){O.set(a,3,b);DIR.set(0,-1,0)}else{O.set(3,a,b);DIR.set(-1,0,0)}
+    var h=hitList.length?cast(O,DIR):null;
+    if(h&&(fromTop?h.point.y>.6:h.point.x>.5)){ud.hit.copy(h.point);ud.ok=true;ud.tp.copy(h.point).addScaledVector(N,off);QN.setFromUnitVectors(ZAX,N);QS.setFromAxisAngle(ZAX,spin);ud.tq.copy(QN).multiply(QS)}}
+  var k=ud.fresh||DT>=1?1:1-Math.exp(-DT*11);obj.position.lerp(ud.tp,k);obj.quaternion.slerp(ud.tq,k);if(snap)ud.fresh=false;
 }
 var tAcc=0;
 function mark(obj){var ud=obj.userData;if(!ud.ok)return;trail[ti].set(ud.hit.x,ud.hit.y,ud.hit.z,1);ti=(ti+1)%NT}
 
-var ready=false,LOOP=38,time=0,clock=0,last=0,vis=false,raf=0,ZS=2.9;
+var ready=false,LOOP=38,time=0,clock=0,last=0,vis=false,raf=0,ZS=2.9,shownCap=-1,shownPr=-1;
 /* 0 arrives · 1 pressure pre-wash · 2 foam · 3 sponge · 4 rinse · 5 towels · 6 shine, then the dust settles back */
 var CUT=[0,2.2,6.4,9.8,15.2,19.4,25,30.2,LOOP],CAP=[0,1,2,2,3,4,5,5],CS=[0,2.2,6.4,15.2,19.4,25],CE=[2.2,6.4,15.2,19.4,25,30.2],lastPh=-1;
 function frame(t){
+  castAcc+=DT;allowCast=castAcc>(lite?.05:.033);if(allowCast)castAcc=0;
   var ph=0;while(ph<7&&t>=CUT[ph+1])ph++;
   var u=(t-CUT[ph])/(CUT[ph+1]-CUT[ph]),e=sm(u),back=sm((t-(LOOP-2.4))/2.4),io=sm(u*7)*sm((1-u)*7),sweep=ZS-2*ZS*e,n;
   var d=U.uDirt.value,f=U.uFoam.value,w=U.uWet.value;U.uLag.value=0;U.uSweep.value=sweep;U.uTrF.value=0;U.uTrW.value=0;
@@ -208,7 +219,8 @@ function frame(t){
   /* pressure washer: aim along the car, end the jet exactly where it meets the bodywork */
   var useGun=ph==1||ph==2||ph==4;gun.visible=hose.visible=useGun;bottle.visible=ph==2;
   if(useGun){gun.position.set(2.25+(1-io)*.9,1.12+.14*Math.sin(clock*1.3)+(1-io)*1.6,sweep+.55);B.set(.2,.6+.4*Math.sin(clock*2.2),sweep-.12);gun.lookAt(B);gun.updateMatrixWorld(true);
-    A.set(0,.005,.78).applyMatrix4(gun.matrixWorld);DIR.copy(B).sub(A).normalize();HN.set(1,0,0);var gh=hitList.length?cast(A,DIR):null;if(gh){B.copy(gh.point);HN.copy(N)}
+    A.set(0,.005,.78).applyMatrix4(gun.matrixWorld);DIR.copy(B).sub(A).normalize();HN.set(1,0,0);
+    if(allowCast){var gh=hitList.length?cast(A,DIR):null;if(gh){B.copy(gh.point);HN.copy(N)}}
     spray(clock,ph==2,io);hoseStep()}
   else{jet.visible=puff.visible=mist.visible=false}
   /* sponge: slow overlapping figure-eights along the side, then across the top; the foam thins where it has just passed */
@@ -239,17 +251,17 @@ function frame(t){
   cam.position.set(Math.sin(th)*R,1.4+.2*Math.sin(clock*.07),Math.cos(th)*R);cam.lookAt(0,asp>1.2?1.0:.8,0);
   if(!NOR)renderer.render(scene,cam);
   var cp=back>.5?0:CAP[ph],pr=back>.5?0:(cp+Math.min(1,(t-CS[cp])/(CE[cp]-CS[cp])))/6;
-  caps.forEach(function(c,i){c.classList.toggle('on',i==cp)});ticks.forEach(function(c,i){c.classList.toggle('on',i<=cp)});
-  rail.style.setProperty('--p',pr.toFixed(3));
+  if(cp!=shownCap){shownCap=cp;caps.forEach(function(c,i){c.classList.toggle('on',i==cp)});ticks.forEach(function(c,i){c.classList.toggle('on',i<=cp)})}
+  if(Math.abs(pr-shownPr)>.004){shownPr=pr;rail.style.setProperty('--p',pr.toFixed(3))}
 }
-function size(){var w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();if(ready&&(!vis||calm)){DT=1;frame(calm?LOOP-5:time)}}
-function tick(now){if(!vis)return;DT=Math.min(.1,(now-last)/1000);last=now;time=(time+DT)%LOOP;clock+=DT;frame(time);raf=requestAnimationFrame(tick)}
+function size(){var w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();if(ready&&(!vis||calm)){DT=1;frame(calm?LOOP-5:time)}}
+function tick(now){if(!vis)return;DT=Math.min(lite?.034:.028,(now-last)/1000);last=now;time=(time+DT)%LOOP;clock+=DT;frame(time);raf=requestAnimationFrame(tick)}
 function play(on){if(on&&!vis&&ready&&!calm){vis=true;last=performance.now();raf=requestAnimationFrame(tick)}else if(!on){vis=false;cancelAnimationFrame(raf)}}
 window.addEventListener('resize',size);
-var seen=true,primed=false;
+var seen=!('IntersectionObserver' in window),primed=false;
 if('IntersectionObserver' in window)new IntersectionObserver(function(en){
   var on=en[0].isIntersecting;if(on)primed=true;seen=on||!primed;play(seen&&!document.hidden);
-},{threshold:0,rootMargin:'180px 0px'}).observe(host);
+},{threshold:0,rootMargin:'12% 0px'}).observe(host);
 document.addEventListener('visibilitychange',function(){play(seen&&!document.hidden)});
 /* test hooks: jump to a time, or simulate a stretch at fixed steps so trails build up; optional fixed camera */
 window.__carSeek=function(t,c){play(false);DT=1;time=t;clock=c||0;frame(t)};
@@ -258,9 +270,10 @@ window.__carView=function(x,y,z,tx,ty,tz,fov){cam.fov=fov||26;cam.updateProjecti
 var NOR=false;
 
 function fail(){host.classList.add('failed')}
-fetch(host.getAttribute('data-model')).then(function(r){return r.json()}).then(function(j){
-  var b=atob(j.glb),n=b.length,u=new Uint8Array(n);for(var i=0;i<n;i++)u[i]=b.charCodeAt(i);
-  new T.GLTFLoader().parse(u.buffer,'',onModel,fail)}).catch(fail);
+function takeModel(buf){new T.GLTFLoader().parse(buf,'',onModel,fail)}
+var queued=window.__ferrariGlb;
+if(queued&&typeof queued.then=='function')queued.then(takeModel).catch(fail);
+else fetch(host.getAttribute('data-model')).then(function(r){return r.arrayBuffer()}).then(takeModel).catch(fail);
 function onModel(gltf){
   var car=gltf.scene,done={};
   car.traverse(function(o){if(!o.isMesh)return;var m=o.material,mn=m&&m.name,nn=o.name;
@@ -282,9 +295,14 @@ function onModel(gltf){
   sh.rotation.x=-Math.PI/2;sh.position.y=.003;sh.renderOrder=2;scene.add(sh);
   var hard=buildRoof();car.add(hard);wheelParts(car);car.traverse(function(o){o.renderOrder=3});scene.add(car);car.updateMatrixWorld(true);
   if(bodyMesh){NM.getNormalMatrix(bodyMesh.matrixWorld);hitList=[bodyMesh,hard.userData.roof]}
-  if(!small){var mir=car.clone(true);mir.scale.y=-1;mir.traverse(function(o){o.renderOrder=0});scene.add(mir)}
-  ready=true;size();host.classList.add('ready');renderer.domElement.style.opacity=1;
-  if(calm){DT=1;frame(LOOP-5)}else{DT=1;frame(0);play(seen&&!document.hidden)}
+  if(!lite){var mir=car.clone(true);mir.scale.y=-1;mir.traverse(function(o){o.renderOrder=0});scene.add(mir)}
+  size();
+  DT=1;allowCast=true;
+  [0,4,8,12,17,22,27].forEach(function(wt){lastPh=-1;frame(wt)});
+  lastPh=-1;shownCap=-1;shownPr=-1;time=0;clock=0;
+  ready=true;DT=1;frame(calm?LOOP-5:0);
+  host.classList.add('ready');renderer.domElement.style.opacity=1;
+  if(!calm)play(seen&&!document.hidden);
 }
 size();
 })();

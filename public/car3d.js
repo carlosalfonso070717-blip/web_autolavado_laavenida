@@ -4,8 +4,8 @@ var host=document.getElementById('car3d');if(!host||!window.THREE)return;
 var T=THREE,calm=matchMedia('(prefers-reduced-motion: reduce)').matches,renderer;
 var small=Math.min(window.innerWidth,window.innerHeight)<700;
 var lite=small||matchMedia('(pointer: coarse)').matches||(navigator.hardwareConcurrency||8)<=4;
-function pixelRatio(){var dpr=window.devicePixelRatio||1,edge=Math.max(host.clientWidth,host.clientHeight,1),cap=lite?900:1500;return Math.max(.7,Math.min(dpr,cap/edge,lite?1:1.25))}
-try{renderer=new T.WebGLRenderer({antialias:!lite,powerPreference:'high-performance',alpha:true})}catch(e){return}
+function pixelRatio(){var dpr=window.devicePixelRatio||1,edge=Math.max(host.clientWidth,host.clientHeight,1);if(!lite)return Math.max(.7,Math.min(dpr,1500/edge,1.25));return Math.max(1,Math.min(dpr,3,2800/edge))}
+try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:true,preserveDrawingBuffer:true})}catch(e){return}
 var run=document.getElementById('washrun'),caps=[].slice.call(run.querySelectorAll('.cap')),rail=document.getElementById('rail'),ticks=[].slice.call(rail.querySelectorAll('span'));
 renderer.setPixelRatio(pixelRatio());
 renderer.setClearColor(0x000000,0);
@@ -272,9 +272,12 @@ function frame(t){
   if(cp!=shownCap){shownCap=cp;caps.forEach(function(c,i){c.classList.toggle('on',i==cp)});ticks.forEach(function(c,i){c.classList.toggle('on',i<=cp)})}
   if(Math.abs(pr-shownPr)>.004){shownPr=pr;rail.style.setProperty('--p',pr.toFixed(3))}
 }
-function size(){var box=stageBox(),w=box?box.ow:host.clientWidth,h=box?box.oh:host.clientHeight;if(!w||!h)return;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();if(ready&&(!vis||calm)){DT=1;frame(calm?LOOP-5:time)}}
+var bufW=0,bufH=0,finger=false,fingerT=0;
+function size(){var box=stageBox(),w=box?box.ow:host.clientWidth,h=box?box.oh:host.clientHeight;if(!w||!h)return;w=Math.round(w);h=Math.round(h);if(w===bufW&&Math.abs(h-bufH)<160)return;bufW=w;bufH=h;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();if(ready&&(!vis||calm)){DT=1;frame(calm?LOOP-5:time)}}
 function tick(now){if(!vis)return;DT=Math.min(lite?.034:.028,(now-last)/1000);last=now;time=(time+DT)%LOOP;clock+=DT;frame(time);raf=requestAnimationFrame(tick)}
-function play(on){if(on&&!vis&&ready&&!calm){vis=true;last=performance.now();raf=requestAnimationFrame(tick)}else if(!on){vis=false;cancelAnimationFrame(raf)}}
+function play(on){if(finger)on=false;if(on&&!vis&&ready&&!calm){vis=true;last=performance.now();raf=requestAnimationFrame(tick)}else if(!on){vis=false;cancelAnimationFrame(raf)}}
+function noteScroll(){finger=true;clearTimeout(fingerT);if(vis)play(false);fingerT=setTimeout(function(){finger=false;play(seen&&!document.hidden)},140)}
+window.addEventListener('scroll',noteScroll,{passive:true});
 window.addEventListener('resize',size);
 var seen=!('IntersectionObserver' in window),primed=false;
 if('IntersectionObserver' in window)new IntersectionObserver(function(en){

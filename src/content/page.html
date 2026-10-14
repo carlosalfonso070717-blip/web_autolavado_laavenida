@@ -60,12 +60,15 @@
   <div class="solid">
     <section class="band" id="servicios"><div class="wrap">
       <div class="head">
-        <h2>Servicios</h2>
+        <div>
+          <p class="kicker">El menú</p>
+          <h2>Servicios</h2>
+        </div>
         <p class="lead">Elige un lavado según lo que necesite tu vehículo y súmale los servicios adicionales que quieras.</p>
       </div>
       <div class="panels">
         <button class="panel panel--deep" data-go="lavados">
-          <h3>Lavados</h3><div style="display:grid;gap:26px">
+          <h3>Lavados</h3><div class="panel-body">
           <ul>
             <li><span>Express</span><span>desde $100</span></li>
             <li><span>Completo</span><span>desde $190</span></li>
@@ -74,7 +77,7 @@
           </ul><div class="panel-top"><span>Ver los cinco lavados</span><span class="arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></div>
         </button>
         <button class="panel panel--pale" data-go="adicionales">
-          <h3>Adicionales</h3><div style="display:grid;gap:26px">
+          <h3>Adicionales</h3><div class="panel-body">
           <ul>
             <li><span>Motor, pintura, rines y faros</span><span>desde $200</span></li>
             <li><span>Vidrios y cristales</span><span>desde $220</span></li>
@@ -87,21 +90,32 @@
 
     <section class="band"><div class="wrap">
       <div class="head">
-        <h2>El Express, según tu vehículo</h2>
+        <div>
+          <p class="kicker">El lavado de diario</p>
+          <h2>El Express, según tu vehículo</h2>
+        </div>
         <p class="lead">Lavado exterior, rines, plásticos básicos y secado a mano con toallas de microfibra. Toca tu tipo de vehículo para ver todos los precios.</p>
       </div>
       <div class="sizes" id="sizes"></div>
     </div></section>
 
     <section class="band"><div class="wrap">
-      <div class="head"><h2>Precios especiales</h2><p class="lead">Dos maneras de pagar menos por tu lavado.</p></div>
+      <div class="head">
+        <div>
+          <p class="kicker">Ahorra</p>
+          <h2>Precios especiales</h2>
+        </div>
+        <p class="lead">Dos maneras de pagar menos por tu lavado.</p>
+      </div>
       <div class="promos">
         <article class="promo promo--water"><div class="drops"></div>
+          <p class="kicker">De 2 a 5</p>
           <h3>Happy Hour Express</h3>
           <p>El lavado Express a precio reducido. Aplica solo en el horario de 2 a 5.</p>
           <div class="promo-foot"><div class="num" data-prices="[null,100,100,120,150]"></div><small data-veh></small></div>
         </article>
         <article class="promo">
+          <p class="kicker">Con comprobante</p>
           <h3>Uber Special</h3>
           <p>Para conductores de plataforma. Válido únicamente presentando comprobante vigente.</p>
           <div class="promo-foot"><div class="num" data-prices="[null,120,160,170,200]"></div><small data-veh></small></div>
@@ -111,7 +125,8 @@
 
     <section class="band" id="nosotros"><div class="wrap">
       <div class="about">
-        <div style="display:grid;gap:28px">
+        <div class="about-copy">
+          <p class="kicker">Campestre, Yucatán</p>
           <h2>Quiénes somos</h2>
           <p class="lead">Club de Autolavado La Avenida abrió en Campestre, Yucatán, en 2022. Atendemos motos, autos, camionetas y SUV de todos los tamaños, del lavado rápido de diario al detallado completo de interiores y pintura.</p>
         </div>
@@ -125,7 +140,7 @@
     </div></section>
 
     <section class="band" id="info"><div class="wrap">
-      <div class="info-top"><h2>Horarios y ubicación</h2></div>
+      <div class="info-top"><p class="kicker">Dónde estamos</p><h2>Horarios y ubicación</h2></div>
       <div class="info">
         <div class="place">
           <p class="place-k">Horario</p>
@@ -142,7 +157,7 @@
     </div></section>
 
     <section class="band" id="faq"><div class="wrap faq">
-      <div class="faq-head"><h2>Preguntas frecuentes</h2><p class="lead">Lo que más nos preguntan antes de venir.</p></div>
+      <div class="faq-head"><p class="kicker">Antes de venir</p><h2>Preguntas frecuentes</h2><p class="lead">Lo que más nos preguntan antes de venir.</p></div>
       <div class="qs" id="qs"></div>
     </div></section>
 

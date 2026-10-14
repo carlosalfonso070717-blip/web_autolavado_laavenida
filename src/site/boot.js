@@ -175,15 +175,12 @@ wrap.style.clipPath='';
 
 /* ---------- faq + contact ---------- */
 var FAQ=[
+ ['¿Cómo sé qué tamaño es mi vehículo?','Manejamos cinco categorías: moto, sedán o auto pequeño, SUV mediano o camioneta, SUV grande o camioneta con tres líneas de asientos, y XL SUV o camioneta. Si tienes duda, lo confirmamos al llegar.'],
  ['¿Qué incluye el lavado Completo?','Lavado exterior, descontaminado y desengrasado de rines y salpicadera, secado a mano con toallas de microfibra, aspirado, limpieza de consola y paneles de puerta, cristales y plásticos interiores y exteriores, y abrillantado de llantas.'],
  ['¿Cuál es la diferencia entre el Completo y el Deluxe?','El Deluxe incluye todo lo del Completo y añade una aplicación de cera líquida, que realza el brillo y ayuda a repeler polvo y agua.'],
- ['¿Cómo sé qué tamaño es mi vehículo?','Manejamos cinco categorías: moto, sedán o auto pequeño, SUV mediano o camioneta, SUV grande o camioneta con tres líneas de asientos, y XL SUV o camioneta. Si tienes duda, lo confirmamos al llegar.'],
- ['¿Cómo funciona el Happy Hour?','De 2 a 5 el lavado Express tiene precio reducido: $100 para sedán y SUV mediano, $120 para SUV grande y $150 para XL SUV. Aplica solo en ese horario.'],
- ['¿Quién puede usar el Uber Special?','Conductores de plataforma que presenten su comprobante vigente. El precio va de $120 a $200 según el tamaño del vehículo.'],
- ['¿Lavan motos?','Sí. Las motos entran en el lavado Express por $100.'],
- ['¿Qué diferencia hay entre las tres ceras?','La cera líquida es ideal para el mantenimiento regular. La cera a mano da un brillo intenso y protección más duradera. La cera con máquina se aplica con pulidora profesional para una cobertura uniforme y un brillo más profundo.'],
- ['¿Puedo agregar servicios adicionales a cualquier lavado?','Sí. En la página de adicionales puedes marcar los que quieras y ver el total según tu vehículo antes de pedirlo.']];
-$('#qs').innerHTML=FAQ.map(function(q,i){return '<div class="qa"><button class="q" id="q'+i+'" aria-expanded="'+(i==0)+'" aria-controls="a'+i+'"><span>'+q[0]+'</span><i></i></button><div class="a" id="a'+i+'" role="region" aria-labelledby="q'+i+'"><div><p>'+q[1]+'</p></div></div></div>'}).join('');
+ ['¿Puedo agregar servicios adicionales a cualquier lavado?','Sí. En la página de adicionales puedes marcar los que quieras y ver el total según tu vehículo antes de pedirlo.'],
+ ['¿Cómo funciona el Happy Hour?','De 2 a 5 el lavado Express tiene precio reducido: $100 para sedán y SUV mediano, $120 para SUV grande y $150 para XL SUV. Aplica solo en ese horario.']];
+$('#qs').innerHTML=FAQ.map(function(q,i){return '<div class="qa"><button class="q" id="q'+i+'" aria-expanded="false" aria-controls="a'+i+'"><span>'+q[0]+'</span><i></i></button><div class="a" id="a'+i+'" role="region" aria-labelledby="q'+i+'"><div><p>'+q[1]+'</p></div></div></div>'}).join('');
 $('#qs').addEventListener('click',function(e){var b=e.target.closest('.q');if(b)b.setAttribute('aria-expanded',b.getAttribute('aria-expanded')!='true')});
 function contactReady(){
   var nombre=$('#c-nombre').value.trim();
@@ -230,7 +227,7 @@ if(gl){
     function colors(){gl.uniform3fv(U.lo,hex('--w-lo'));gl.uniform3fv(U.hi,hex('--w-hi'));gl.uniform3fv(U.gt,hex('--w-glint'))}
     function size(){var s=Math.min(devicePixelRatio||1,1.5)*.6;cv.width=Math.max(2,innerWidth*s|0);cv.height=Math.max(2,innerHeight*s|0);gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(U.r,cv.width,cv.height)}
     var washEl=document.getElementById('washrun'),carZone=false,zoneTick=0;
-    function syncZone(){if(!washEl)return;carZone=washEl.getBoundingClientRect().top<innerHeight}
+    function syncZone(){var el=document.querySelector('.opening')||washEl;if(!el)return;carZone=el.getBoundingClientRect().bottom<80}
     function frame(t){
       if(!carZone&&(scrollY<innerHeight*.95||WT.force)){mx+=(tx-mx)*.06;my+=(ty-my)*.06;gl.uniform1f(U.t,t/1000);gl.uniform2f(U.m,mx,my);gl.drawArrays(gl.TRIANGLES,0,3)}
       if(!calm)requestAnimationFrame(frame);

@@ -5,7 +5,7 @@ var T=THREE,calm=matchMedia('(prefers-reduced-motion: reduce)').matches,renderer
 var small=Math.min(window.innerWidth,window.innerHeight)<700;
 var lite=small||matchMedia('(pointer: coarse)').matches||(navigator.hardwareConcurrency||8)<=4;
 function pixelRatio(){var dpr=window.devicePixelRatio||1,edge=Math.max(host.clientWidth,host.clientHeight,1);if(!lite)return Math.max(.7,Math.min(dpr,1500/edge,1.25));return Math.max(1,Math.min(dpr,3,2800/edge))}
-try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance',alpha:true,preserveDrawingBuffer:true})}catch(e){return}
+try{renderer=new T.WebGLRenderer({antialias:!lite,powerPreference:'high-performance',alpha:true,preserveDrawingBuffer:false})}catch(e){return}
 var run=document.getElementById('washrun'),caps=[].slice.call(run.querySelectorAll('.cap')),rail=document.getElementById('rail'),ticks=[].slice.call(rail.querySelectorAll('span'));
 renderer.setPixelRatio(pixelRatio());
 renderer.setClearColor(0x000000,0);
@@ -318,11 +318,16 @@ function onModel(gltf){
   if(bodyMesh){NM.getNormalMatrix(bodyMesh.matrixWorld);hitList=[bodyMesh,hard.userData.roof]}
   size();
   DT=1;allowCast=true;
-  [0,4,8,12,17,22,27].forEach(function(wt){lastPh=-1;frame(wt)});
-  lastPh=-1;shownCap=-1;shownPr=-1;time=0;clock=0;
-  ready=true;DT=1;frame(calm?LOOP-5:0);
-  host.classList.add('ready');renderer.domElement.style.opacity=1;
-  if(!calm)play(seen&&!document.hidden);
+  var warm=[0,4,8,12,17,22,27],wi=0;
+  function warmStep(){
+    lastPh=-1;frame(warm[wi]);wi++;
+    if(wi<warm.length){requestAnimationFrame(warmStep);return}
+    lastPh=-1;shownCap=-1;shownPr=-1;time=0;clock=0;
+    ready=true;DT=1;frame(calm?LOOP-5:0);
+    host.classList.add('ready');
+    if(!calm)play(seen&&!document.hidden);
+  }
+  requestAnimationFrame(warmStep);
 }
 size();
 })();

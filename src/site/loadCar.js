@@ -17,10 +17,6 @@ export async function loadCar() {
   if (document.querySelector('#car3d canvas')) return
   const base = 'https://cdn.jsdelivr.net/npm/three@0.147.0'
   await loadScript(`${base}/build/three.min.js`)
-  await Promise.all([
-    loadScript(`${base}/examples/js/loaders/GLTFLoader.js`),
-    loadScript(`${base}/examples/js/environments/RoomEnvironment.js`),
-    loadScript(`${base}/examples/js/math/MeshSurfaceSampler.js`)
-  ])
+  await loadScript(`${base}/examples/js/loaders/GLTFLoader.js`)
   await loadScript('/car3d.js')
 }

@@ -17,7 +17,7 @@ var WASH=[
   {n:'Completo',p:[null,190,220,250,320],d:'Lavado exterior, descontaminar y desgrasar rines y salpicadera, secado a mano con toallas de microfibra, aspirar, limpieza de consola y paneles de puerta, cristales y plásticos interiores y exteriores, abrillantado de llantas.',i:['Lavado exterior','Rines y salpicadera','Secado con microfibra','Aspirado','Consola y paneles','Cristales y plásticos','Abrillantado de llantas']},
   {n:'Deluxe',p:[null,340,370,400,450],d:'Lavado exterior, cera líquida, descontaminar y desgrasar rines y salpicadera, secado a mano con toallas de microfibra, aspirar, limpieza de consola, paneles, cristales y plásticos interiores y exteriores, abrillantado de llantas.',i:['Todo lo del Completo','Cera líquida']},
   {n:'Uber Special',p:[null,120,160,170,200],d:'Válido únicamente presentando comprobante vigente de la plataforma.',i:['Con comprobante vigente'],sp:1},
-  {n:'Happy Hour Express',p:[null,100,100,120,150],d:'El lavado Express a precio reducido. Aplicable solo en el horario de 2 a 5.',i:['Solo de 2 a 5'],sp:1}];
+  {n:'Happy Hour Express',p:[null,100,100,120,150],d:'El lavado Express a precio reducido. Aplicable solo en el horario de 2:00 p. m. a 5:00 p. m.',i:['Solo de 2:00 p. m. a 5:00 p. m.'],sp:1}];
 var MATRIX=[['Lavado exterior',1,1,1],['Secado a mano con toallas de microfibra',1,1,1],['Rines',1,1,1],['Plásticos básicos',1,1,1],['Descontaminar y desgrasar rines y salpicadera',0,1,1],['Aspirado',0,1,1],['Limpieza de consola y paneles de puerta',0,1,1],['Cristales y plásticos interiores y exteriores',0,1,1],['Abrillantado de llantas',0,1,1],['Cera líquida',0,0,1]];
 var CATS=[
  {t:'Exterior',s:'Motor, pintura, rines y faros.',x:[
@@ -41,7 +41,8 @@ var CATS=[
   ['Cera con máquina','',[370,420,450,500],'Aplicada con pulidora profesional para lograr una cobertura uniforme, un brillo profundo y mejor adherencia del producto. Protege la pintura con un acabado de calidad profesional.']]}];
 
 var S={veh:1,wash:null,extras:{}};
-function money(v){return v==null?'—':'<sup>$</sup>'+v.toLocaleString('es-MX')}
+function pesos(v){return v.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function money(v){return v==null?'—':'<sup>$</sup>'+pesos(v)}
 
 /* ---------- build ---------- */
 $('#sizes').innerHTML=VEH.map(function(v,i){return '<button class="size" data-veh-set="'+i+'" data-go="lavados"><div><span class="kicker">Express</span><em>'+v.l+'</em><small>'+v.n+'</small></div><div class="num">'+money(WASH[0].p[i])+'</div><div class="bar" style="--w:'+(WASH[0].p[i]/190*100)+'%"></div></button>'}).join('');
@@ -50,11 +51,12 @@ function washRow(w,i){return '<article class="wash" data-wash="'+i+'"><h3>'+w.n+
 $('#washes').innerHTML=WASH.map(function(w,i){return w.sp?'':washRow(w,i)}).join('');
 $('#specials').innerHTML=WASH.map(function(w,i){return w.sp?washRow(w,i):''}).join('');
 $('#matrix').innerHTML=MATRIX.map(function(r){return '<tr><th scope="row">'+r[0]+'</th>'+['Express','Completo','Deluxe'].map(function(name,k){return '<td data-wash="'+name+'">'+(r[k+1]?'<span class="dot"></span><span class="sr">Incluido</span>':'<span class="nodot"></span><span class="sr">No incluido</span>')+'</td>'}).join('')+'</tr>'}).join('');
-$('#alltbl').innerHTML='<thead><tr><th></th>'+VEH.map(function(v,i){return '<th data-col="'+i+'">'+v.l+(v.n?'<br>('+v.n+')':'')+'</th>'}).join('')+'</tr></thead><tbody>'+WASH.map(function(w){return '<tr><th scope="row">'+w.n+'</th>'+w.p.map(function(p,i){return '<td data-col="'+i+'" data-vname="'+VEH[i].s+'">'+(p==null?'—':'$'+p)+'</td>'}).join('')+'</tr>'}).join('')+'</tbody>';
+$('#alltbl').innerHTML='<thead><tr><th></th>'+VEH.map(function(v,i){return '<th data-col="'+i+'">'+v.l+(v.n?'<br>('+v.n+')':'')+'</th>'}).join('')+'</tr></thead><tbody>'+WASH.map(function(w){return '<tr><th scope="row">'+w.n+'</th>'+w.p.map(function(p,i){return '<td data-col="'+i+'" data-vname="'+VEH[i].s+'">'+(p==null?'—':'$'+pesos(p))+'</td>'}).join('')+'</tr>'}).join('')+'</tbody>';
 var xi=0;
 $('#cats').innerHTML=CATS.map(function(c){return '<section class="cat"><h3>'+c.t+'<small>'+c.s+'</small></h3><div class="xlist">'+c.x.map(function(x){var id=xi++;x.id=id;return '<label class="x" for="x'+id+'"><input type="checkbox" id="x'+id+'" data-x="'+id+'"><span class="box"></span><b>'+x[0]+(x[1]?'<small>'+x[1]+'</small>':'')+'</b><span class="num" data-prices="'+JSON.stringify(x[2])+'"></span>'+(x[3]?'<p>'+x[3]+'</p>':'')+'</label>'}).join('')+'</div></section>'}).join('');
 var XALL=[];CATS.forEach(function(c){c.x.forEach(function(x){XALL[x.id]=x})});
-$$('[data-seg]').forEach(function(seg){var n=+seg.dataset.seg;seg.innerHTML=VEH.map(function(v,i){return (n==4&&i==0)?'':'<button data-veh-set="'+i+'" aria-pressed="false">'+v.s+'</button>'}).join('')});
+$$('[data-seg]').forEach(function(seg){var n=+seg.dataset.seg;seg.innerHTML=VEH.map(function(v,i){return (n==4&&i==0)?'':'<button data-veh-set="'+i+'" aria-pressed="false">'+v.s+'</button>'}).join('');seg.removeAttribute('aria-busy')});
+$$('[aria-busy]').forEach(function(el){el.removeAttribute('aria-busy')});
 
 /* ---------- state ---------- */
 function tween(el,to){
@@ -92,7 +94,7 @@ $('#bar-send').addEventListener('click',function(){
   if(S.wash!=null&&WASH[S.wash].p[S.veh]!=null){total+=WASH[S.wash].p[S.veh];lines.push('Lavado '+WASH[S.wash].n)}
   ids.forEach(function(id){total+=XALL[id][2][Math.max(S.veh,1)-1];lines.push(XALL[id][0]+(XALL[id][1]?' ('+XALL[id][1]+')':''))});
   if(!lines.length)return;
-  openWhatsApp('Hola, quiero pedir en La Avenida:\n'+lines.join('\n')+'\nVehículo: '+v.l+'\nTotal: $'+total.toLocaleString('es-MX'));
+  openWhatsApp('Hola, quiero pedir en La Avenida:\n'+lines.join('\n')+'\nVehículo: '+v.l+'\nTotal: $'+pesos(total));
 });
 function closeMenu(){$('#menu').classList.remove('open');document.body.classList.remove('nav-open');var b=$('#burger');if(b)b.setAttribute('aria-expanded','false')}
 $('#burger').addEventListener('click',function(e){
@@ -101,13 +103,7 @@ $('#burger').addEventListener('click',function(e){
   document.body.classList.toggle('nav-open',o);
   this.setAttribute('aria-expanded',o?'true':'false');
 });
-$('#social-toggle').addEventListener('click',function(e){
-  e.stopPropagation();
-  var open=$('#social').classList.toggle('open');
-  this.setAttribute('aria-expanded',open?'true':'false');
-});
 document.addEventListener('click',function(e){
-  if(!e.target.closest('#social')){$('#social').classList.remove('open');$('#social-toggle').setAttribute('aria-expanded','false')}
   if(!e.target.closest('.topbar'))closeMenu();
 });
 
@@ -185,10 +181,10 @@ wrap.style.clipPath='';
 /* ---------- faq + contact ---------- */
 var FAQ=[
  ['¿Cómo sé qué tamaño es mi vehículo?','Manejamos cinco categorías: moto, sedán o auto pequeño, SUV mediano o camioneta, SUV grande o camioneta con tres líneas de asientos, y XL SUV o camioneta. Si tienes duda, lo confirmamos al llegar.'],
- ['¿Qué incluye el lavado Completo?','Lavado exterior, descontaminado y desengrasado de rines y salpicadera, secado a mano con toallas de microfibra, aspirado, limpieza de consola y paneles de puerta, cristales y plásticos interiores y exteriores, y abrillantado de llantas.'],
+ ['¿Qué incluye el lavado Completo?','Lavado exterior, descontaminado, desengrasado de rines, salpicadera, secado a mano con toallas de microfibra, aspirado, limpieza de consola, paneles de puerta, cristales, plásticos interiores, plásticos exteriores y abrillantado de llantas.'],
  ['¿Cuál es la diferencia entre el Completo y el Deluxe?','El Deluxe incluye todo lo del Completo y añade una aplicación de cera líquida, que realza el brillo y ayuda a repeler polvo y agua.'],
  ['¿Puedo agregar servicios adicionales a cualquier lavado?','Sí. En la página de adicionales puedes marcar los que quieras y ver el total según tu vehículo antes de pedirlo.'],
- ['¿Cómo funciona el Happy Hour?','De 2 a 5 el lavado Express tiene precio reducido: $100 para sedán y SUV mediano, $120 para SUV grande y $150 para XL SUV. Aplica solo en ese horario.']];
+ ['¿Cómo funciona el Happy Hour?','De 2:00 p. m. a 5:00 p. m. el lavado Express tiene precio reducido: $100.00 para sedán y SUV mediano, $120.00 para SUV grande y $150.00 para XL SUV. Aplica solo en ese horario.']];
 $('#qs').innerHTML=FAQ.map(function(q,i){return '<div class="qa"><button class="q" id="q'+i+'" aria-expanded="false" aria-controls="a'+i+'"><span>'+q[0]+'</span><i></i></button><div class="a" id="a'+i+'" role="region" aria-labelledby="q'+i+'"><div><p>'+q[1]+'</p></div></div></div>'}).join('');
 $('#qs').addEventListener('click',function(e){var b=e.target.closest('.q');if(b)b.setAttribute('aria-expanded',b.getAttribute('aria-expanded')!='true')});
 function contactReady(){
@@ -216,8 +212,9 @@ $('#cform').addEventListener('submit',function(e){
   openWhatsApp('Hola, soy '+$('#c-nombre').value.trim()+'.\nTeléfono: '+tel+'\nVehículo: '+$('#c-veh').value+'\nServicio: '+$('#c-serv').value+'\nMensaje: '+$('#c-msg').value.trim());
 });
 
-/* ---------- sunlit water (WebGL) ---------- */
-var cv=$('#water'),gl=null;try{gl=cv.getContext('webgl',{antialias:false,alpha:true,preserveDrawingBuffer:true})}catch(_){}
+/* ---------- sunlit water (WebGL), after the first paint ---------- */
+function startWater(){
+var cv=$('#water'),gl=null;try{gl=cv.getContext('webgl',{antialias:false,alpha:true,preserveDrawingBuffer:false})}catch(_){}
 if(gl){
   var vs='attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
   var fs='precision highp float;uniform vec2 r;uniform float t;uniform vec2 m;uniform vec3 lo,hi,gt;'+
@@ -256,5 +253,7 @@ if(gl){
     new MutationObserver(function(){colors();if(calm)frame(4000)}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
   }
 }
-
+}
+if(window.requestIdleCallback)requestIdleCallback(startWater,{timeout:500});
+else requestAnimationFrame(startWater);
 }

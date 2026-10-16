@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://web-autolavado-laavenida.clubautolavado38.workers.dev/sitemap.xml

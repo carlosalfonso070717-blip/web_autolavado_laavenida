@@ -52,9 +52,9 @@ export const washes = [
     name: 'Uber Special',
     special: true,
     prices: [null, 120, 160, 170, 200],
-    summary: 'Precio especial con comprobante vigente.',
-    description: 'Válido únicamente presentando comprobante vigente de la plataforma.',
-    includes: ['Con comprobante vigente'],
+    summary: 'Lavado exterior y aspirado interior, con comprobante vigente.',
+    description: 'Lavado exterior y aspirado interior. Válido únicamente presentando comprobante vigente de la plataforma.',
+    includes: ['Lavado exterior', 'Aspirado interior'],
   },
   {
     id: 'happy-hour',

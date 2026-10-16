@@ -13,12 +13,11 @@ var VEH=[
   {s:'SUV grande',l:'SUV grande / camioneta',n:'3 líneas de asientos'},
   {s:'XL SUV',l:'XL SUV / camioneta',n:''}];
 var WASH=[
-  {n:'Express',p:[100,130,160,170,190],d:'Lavado exterior, rines, plásticos básicos y secado a mano con toallas de microfibra.',i:['Lavado exterior','Rines','Plásticos básicos','Secado con microfibra']},
-  {n:'Completo',p:[null,190,220,250,320],d:'Lavado exterior, descontaminar y desgrasar rines y salpicadera, secado a mano con toallas de microfibra, aspirar, limpieza de consola y paneles de puerta, cristales y plásticos interiores y exteriores, abrillantado de llantas.',i:['Lavado exterior','Rines y salpicadera','Secado con microfibra','Aspirado','Consola y paneles','Cristales y plásticos','Abrillantado de llantas']},
-  {n:'Deluxe',p:[null,340,370,400,450],d:'Lavado exterior, cera líquida, descontaminar y desgrasar rines y salpicadera, secado a mano con toallas de microfibra, aspirar, limpieza de consola, paneles, cristales y plásticos interiores y exteriores, abrillantado de llantas.',i:['Todo lo del Completo','Cera líquida']},
-  {n:'Uber Special',p:[null,120,160,170,200],d:'Válido únicamente presentando comprobante vigente de la plataforma.',i:['Con comprobante vigente'],sp:1},
+  {n:'Express',p:[100,130,160,170,190],d:'El lavado de diario, por fuera.',i:['Lavado exterior','Rines','Plásticos básicos','Secado a mano con microfibra']},
+  {n:'Completo',p:[null,190,220,250,320],d:'Suma el interior al Express.',i:['Lavado exterior','Rines y salpicadera','Secado a mano con microfibra','Aspirado','Consola y paneles','Cristales y plásticos','Abrillantado de llantas']},
+  {n:'Deluxe',p:[null,340,370,400,450],d:'El Completo, con cera líquida.',i:['Todo lo del Completo','Cera líquida']},
+  {n:'Uber Special',p:[null,120,160,170,200],d:'Válido únicamente presentando comprobante vigente de la plataforma.',i:['Lavado exterior','Aspirado interior'],sp:1},
   {n:'Happy Hour Express',p:[null,100,100,120,150],d:'El lavado Express a precio reducido. Aplicable solo en el horario de 2:00 p. m. a 5:00 p. m.',i:['Solo de 2:00 p. m. a 5:00 p. m.'],sp:1}];
-var MATRIX=[['Lavado exterior',1,1,1],['Secado a mano con toallas de microfibra',1,1,1],['Rines',1,1,1],['Plásticos básicos',1,1,1],['Descontaminar y desgrasar rines y salpicadera',0,1,1],['Aspirado',0,1,1],['Limpieza de consola y paneles de puerta',0,1,1],['Cristales y plásticos interiores y exteriores',0,1,1],['Abrillantado de llantas',0,1,1],['Cera líquida',0,0,1]];
 var CATS=[
  {t:'Exterior',s:'Motor, pintura, rines y faros.',x:[
   ['Lavado de motor','',[400,500,600,600]],
@@ -47,15 +46,25 @@ function money(v){return v==null?'—':'<sup>$</sup>'+pesos(v)}
 /* ---------- build ---------- */
 $('#sizes').innerHTML=VEH.map(function(v,i){return '<button class="size" data-veh-set="'+i+'" data-go="lavados"><div><span class="kicker">Express</span><em>'+v.l+'</em><small>'+v.n+'</small></div><div class="num">'+money(WASH[0].p[i])+'</div><div class="bar" style="--w:'+(WASH[0].p[i]/190*100)+'%"></div></button>'}).join('');
 
-function washRow(w,i){return '<article class="wash" data-wash="'+i+'"><h3>'+w.n+'</h3><div><p class="desc">'+w.d+'</p><ul class="incl">'+w.i.map(function(t){return '<li>'+t+'</li>'}).join('')+'</ul></div><div class="wash-price"><div class="num" data-prices="'+JSON.stringify(w.p)+'"></div><small data-veh-or-na></small><button class="btn btn--line btn--sm pick" aria-pressed="false" data-pick="'+i+'"><span>Elegir</span></button></div></article>'}
+function washRow(w,i){return '<article class="wash" data-wash="'+i+'"><header class="wash-top"><h3>'+w.n+'</h3><p class="desc">'+w.d+'</p></header><div class="wash-inc"><p class="wash-k">Incluye</p><ul class="incl">'+w.i.map(function(t){return '<li>'+t+'</li>'}).join('')+'</ul></div><div class="wash-price"><div class="num" data-prices="'+JSON.stringify(w.p)+'"></div><small data-veh-or-na></small><button class="btn btn--line btn--sm pick" aria-pressed="false" data-pick="'+i+'"><span>Elegir</span></button></div></article>'}
 $('#washes').innerHTML=WASH.map(function(w,i){return w.sp?'':washRow(w,i)}).join('');
 $('#specials').innerHTML=WASH.map(function(w,i){return w.sp?washRow(w,i):''}).join('');
-$('#matrix').innerHTML=MATRIX.map(function(r){return '<tr><th scope="row">'+r[0]+'</th>'+['Express','Completo','Deluxe'].map(function(name,k){return '<td data-wash="'+name+'">'+(r[k+1]?'<span class="dot"></span><span class="sr">Incluido</span>':'<span class="nodot"></span><span class="sr">No incluido</span>')+'</td>'}).join('')+'</tr>'}).join('');
-$('#alltbl').innerHTML='<thead><tr><th></th>'+VEH.map(function(v,i){return '<th data-col="'+i+'">'+v.l+(v.n?'<br>('+v.n+')':'')+'</th>'}).join('')+'</tr></thead><tbody>'+WASH.map(function(w){return '<tr><th scope="row">'+w.n+'</th>'+w.p.map(function(p,i){return '<td data-col="'+i+'" data-vname="'+VEH[i].s+'">'+(p==null?'—':'$'+pesos(p))+'</td>'}).join('')+'</tr>'}).join('')+'</tbody>';
 var xi=0;
 $('#cats').innerHTML=CATS.map(function(c){return '<section class="cat"><h3>'+c.t+'<small>'+c.s+'</small></h3><div class="xlist">'+c.x.map(function(x){var id=xi++;x.id=id;return '<label class="x" for="x'+id+'"><input type="checkbox" id="x'+id+'" data-x="'+id+'"><span class="box"></span><b>'+x[0]+(x[1]?'<small>'+x[1]+'</small>':'')+'</b><span class="num" data-prices="'+JSON.stringify(x[2])+'"></span>'+(x[3]?'<p>'+x[3]+'</p>':'')+'</label>'}).join('')+'</div></section>'}).join('');
 var XALL=[];CATS.forEach(function(c){c.x.forEach(function(x){XALL[x.id]=x})});
-$$('[data-seg]').forEach(function(seg){var n=+seg.dataset.seg;seg.innerHTML=VEH.map(function(v,i){return (n==4&&i==0)?'':'<button data-veh-set="'+i+'" aria-pressed="false">'+v.s+'</button>'}).join('');seg.removeAttribute('aria-busy')});
+$$('[data-seg]').forEach(function(seg){
+  var n=+seg.dataset.seg;
+  seg.innerHTML=VEH.map(function(v,i){
+    if(n==4&&i==0)return '';
+    return '<button data-veh-set="'+i+'" aria-pressed="false"><span class="seg-s">'+v.s+'</span><span class="seg-l">'+v.l+(v.n?'<small>'+v.n+'</small>':'')+'</span></button>';
+  }).join('');
+  seg.removeAttribute('aria-busy');
+  var pick=document.createElement('div');
+  pick.className='vehpick';
+  pick.innerHTML='<div class="vehpick-copy"><p class="vehpick-k">Elige tu tipo de vehículo</p><p class="vehpick-note">Los precios de esta página son para el auto que elijas.</p></div><button type="button" class="vehpick-btn" aria-expanded="false" aria-haspopup="listbox"><span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+  seg.before(pick);
+  pick.appendChild(seg);
+});
 $$('[aria-busy]').forEach(function(el){el.removeAttribute('aria-busy')});
 
 /* ---------- state ---------- */
@@ -73,7 +82,7 @@ function update(){
     $('[data-veh-or-na]',r).textContent=na?'No disponible para moto':v.l;
     var b=$('.pick',r);b.disabled=na;b.setAttribute('aria-pressed',S.wash==+r.dataset.wash);b.firstChild.textContent=S.wash==+r.dataset.wash?'Elegido':'Elegir'});
   $$('[data-seg] button').forEach(function(b){var i=+b.dataset.vehSet,on=i==S.veh||(b.parentNode.dataset.seg=='4'&&S.veh==0&&i==1);b.setAttribute('aria-pressed',on)});
-  $$('[data-col]').forEach(function(c){c.classList.toggle('sel',+c.dataset.col==S.veh)});
+  $$('.vehpick').forEach(function(p){var seg=$('[data-seg]',p),i=S.veh;if(seg.dataset.seg=='4'&&i==0)i=1;$('.vehpick-btn span',p).textContent=VEH[i].l});
   var ids=Object.keys(S.extras),total=0,parts=[];
   if(S.wash!=null){var wp=WASH[S.wash].p[S.veh];if(wp==null)S.wash=null;else{total+=wp;parts.push('Lavado '+WASH[S.wash].n)}}
   ids.forEach(function(id){total+=XALL[id][2][Math.max(S.veh,1)-1]});
@@ -81,8 +90,17 @@ function update(){
   $('#bar').classList.toggle('show',parts.length>0);
   if(parts.length){$('#bar-title').textContent=parts.join(' + ');$('#bar-sub').textContent=(ids.length&&S.veh==0?vx:v).l;tween($('#bar-total'),total)}
 }
+function closePicks(){$$('.vehpick.open').forEach(function(p){p.classList.remove('open');var b=$('.vehpick-btn',p);if(b)b.setAttribute('aria-expanded','false')})}
 document.addEventListener('click',function(e){
-  var t=e.target.closest('[data-veh-set]');if(t){S.veh=+t.dataset.vehSet;update()}
+  var pickBtn=e.target.closest('.vehpick-btn');
+  if(pickBtn){
+    var pick=pickBtn.closest('.vehpick'),willOpen=!pick.classList.contains('open');
+    closePicks();
+    if(willOpen){pick.classList.add('open');pickBtn.setAttribute('aria-expanded','true')}
+    return;
+  }
+  var t=e.target.closest('[data-veh-set]');if(t){S.veh=+t.dataset.vehSet;update();closePicks()}
+  else if(!e.target.closest('.vehpick'))closePicks();
   t=e.target.closest('[data-pick]');if(t){var i=+t.dataset.pick;S.wash=S.wash==i?null:i;update()}
   t=e.target.closest('[data-go]');if(t)go(t.dataset.go,t.dataset.scroll);
 });
@@ -152,25 +170,33 @@ function sheet(T,B,ph){
   for(i=n;i>=0;i--){x=i/n*W;pts.push(x.toFixed(0)+'px '+(B*H+Math.sin(i*.8-ph)*A+Math.sin(i*.31+ph*1.2)*A*.6).toFixed(1)+'px')}
   wrap.style.clipPath='polygon('+pts.join(',')+')';
 }
+var sheetGen=0,sheetTimer=0,uncoverTimer=0;
 function phase(from,to,dur,fn,done){
-  var t0=performance.now();
-  (function st(t){var k=Math.min((t-t0)/dur,1);fn(from+(to-from)*io(k),t/260,k);if(k<1)requestAnimationFrame(st);else done&&done()})(t0);
+  var gen=sheetGen,t0=performance.now();
+  (function st(t){
+    if(gen!==sheetGen)return;
+    var k=Math.min((t-t0)/dur,1);
+    fn(from+(to-from)*io(k),t/260,k);
+    if(gen!==sheetGen)return;
+    if(k<1)requestAnimationFrame(st);else done&&done();
+  })(t0);
 }
-var sheetTimer=0;
 function releaseSheet(){
+  sheetGen++;
   clearTimeout(sheetTimer);
+  clearTimeout(uncoverTimer);
   wrap.classList.remove('over');wrap.style.clipPath='';tw.style.opacity=0;WT.force=false;busy=false;
 }
 function uncover(done){
   phase(1.12,-.14,900,function(B,ph,k){sheet(-.14,B,ph);tw.style.opacity=Math.max(0,1-k*2.4)},function(){releaseSheet();done&&done()});
 }
 function go(name,scrollId){
-  if(busy)return;
+  if(busy){releaseSheet();show(name,scrollId);return}
   if(name==cur){var el=scrollId&&document.getElementById(scrollId);window.scrollTo({top:el?el.getBoundingClientRect().top+scrollY-108:0,behavior:calm?'auto':'smooth'});$('#menu').classList.remove('open');return}
   if(calm){show(name,scrollId);return}
   busy=true;WT.force=true;WT.once=true;wrap.classList.add('over');
   clearTimeout(sheetTimer);sheetTimer=setTimeout(releaseSheet,2400);
-  phase(1.14,-.14,760,function(T,ph,k){sheet(T,1.14,ph);tw.style.opacity=Math.max(0,k*2-1)},function(){show(name,scrollId);setTimeout(uncover,140)});
+  phase(1.14,-.14,760,function(T,ph,k){sheet(T,1.14,ph);tw.style.opacity=Math.max(0,k*2-1)},function(){show(name,scrollId);clearTimeout(uncoverTimer);uncoverTimer=setTimeout(uncover,140)});
 }
 var h=(location.hash||'').slice(1);
 if(h=='lavados'||h=='adicionales')show(h);else{update();placeNav()}
@@ -232,19 +258,27 @@ if(gl){
     function hex(n){var v=getComputedStyle(document.documentElement).getPropertyValue(n).trim().replace('#','');if(v.length<6)return[.58,.82,.94];return [0,2,4].map(function(i){return parseInt(v.substr(i,2),16)/255})}
     function colors(){gl.uniform3fv(U.lo,hex('--w-lo'));gl.uniform3fv(U.hi,hex('--w-hi'));gl.uniform3fv(U.gt,hex('--w-glint'))}
     var waterW=0,waterH=0,waterFinger=false,waterFingerT=0;
-    function drawWater(t){if(gl.isContextLost&&gl.isContextLost()){cv.classList.remove('live');return}colors();mx+=(tx-mx)*.06;my+=(ty-my)*.06;gl.uniform1f(U.t,(t||0)/1000);gl.uniform2f(U.m,mx,my);gl.drawArrays(gl.TRIANGLES,0,3);cv.classList.add('live')}
-    function size(){var s=Math.min(devicePixelRatio||1,1.5)*.6,w=Math.max(2,innerWidth*s|0),h=Math.max(2,innerHeight*s|0);if(WT.force)return;if(waterW&&Math.abs(w-waterW)<2&&Math.abs(h-waterH)<160)return;waterW=w;waterH=h;cv.width=w;cv.height=h;gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(U.r,cv.width,cv.height);drawWater(performance.now())}
+    var waterDead=false;
+    function drawWater(t){if(waterDead||(gl.isContextLost&&gl.isContextLost())){waterDead=true;cv.classList.remove('live');return}mx+=(tx-mx)*.06;my+=(ty-my)*.06;gl.uniform1f(U.t,(t||0)/1000);gl.uniform2f(U.m,mx,my);gl.drawArrays(gl.TRIANGLES,0,3);cv.classList.add('live')}
+    function size(){if(waterDead)return;var s=Math.min(devicePixelRatio||1,1.5)*.6,w=Math.max(2,innerWidth*s|0),h=Math.max(2,innerHeight*s|0);if(WT.force)return;if(waterW&&Math.abs(w-waterW)<2&&Math.abs(h-waterH)<160)return;waterW=w;waterH=h;cv.width=w;cv.height=h;gl.viewport(0,0,cv.width,cv.height);gl.uniform2f(U.r,cv.width,cv.height);drawWater(performance.now())}
     var washEl=document.getElementById('washrun'),carZone=false,zoneTick=0;
     function syncZone(){var el=document.querySelector('[data-view="inicio"]:not([hidden]) .opening')||washEl;if(!el){carZone=cur!='inicio';return}carZone=el.getBoundingClientRect().bottom<80}
+    function heroVisible(){return !carZone&&scrollY<innerHeight*.95}
+    function ferrariOnScreen(){var car=document.getElementById('car3d');return !!(car&&car.classList.contains('ready')&&heroVisible())}
+    var waterRaf=0;
     function frame(t){
+      waterRaf=0;
+      if(waterDead)return;
+      var sheet=WT.once||WT.force;
       if(WT.once){WT.once=false;drawWater(t)}
-      else if(!waterFinger&&!WT.force&&!carZone&&scrollY<innerHeight*.95)drawWater(t);
-      if(!calm)requestAnimationFrame(frame);
+      else if(!document.hidden&&!waterFinger&&!WT.force&&heroVisible()&&!ferrariOnScreen())drawWater(t);
+      if(!calm&&!waterDead&&!document.hidden&&(sheet||(heroVisible()&&!ferrariOnScreen())))waterRaf=requestAnimationFrame(frame);
     }
-    cv.addEventListener('webglcontextlost',function(e){e.preventDefault();cv.classList.remove('live')});
-    cv.addEventListener('webglcontextrestored',function(){waterW=0;size();colors();drawWater(performance.now())});
-    addEventListener('scroll',function(){if(WT.force)return;waterFinger=true;clearTimeout(waterFingerT);waterFingerT=setTimeout(function(){waterFinger=false;drawWater(performance.now())},140)},{passive:true});
+    function wakeWater(){if(waterDead||calm||document.hidden||waterRaf)return;waterRaf=requestAnimationFrame(frame)}
+    cv.addEventListener('webglcontextlost',function(e){e.preventDefault();waterDead=true;cv.classList.remove('live')});
+    addEventListener('scroll',function(){if(WT.force||waterDead)return;waterFinger=true;clearTimeout(waterFingerT);waterFingerT=setTimeout(function(){waterFinger=false;if(!document.hidden&&heroVisible()&&!ferrariOnScreen())drawWater(performance.now());wakeWater()},140)},{passive:true});
     addEventListener('scroll',function(){if(zoneTick)return;zoneTick=requestAnimationFrame(function(){zoneTick=0;syncZone()})},{passive:true});
+    document.addEventListener('visibilitychange',wakeWater);
     syncZone();
     colors();size();frame(calm?4000:0);
     addEventListener('resize',function(){size();if(calm)frame(4000)});

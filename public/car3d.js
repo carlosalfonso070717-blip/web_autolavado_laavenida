@@ -13,10 +13,13 @@ renderer.outputEncoding=T.sRGBEncoding;renderer.toneMapping=T.ACESFilmicToneMapp
 host.appendChild(renderer.domElement);
 var BG=new T.Color(0x03121d),scene=new T.Scene();scene.background=null;
 var cam=new T.PerspectiveCamera(30,1,.1,80),carCenter=new T.Vector3(),carSize=new T.Vector3(2,1,4.2),bodyBox=null,camRight=new T.Vector3(),camUp=new T.Vector3(),viewEdge=4;
-function stageBox(){var opening=host.closest('.opening');if(!opening)return null;var or=opening.getBoundingClientRect(),rr=run.getBoundingClientRect();if(!or.width||!rr.width)return null;return {ow:or.width,oh:or.height,rx:rr.left-or.left,ry:rr.top-or.top,rw:rr.width,rh:rr.height}}
+var stage=null;
+function measureStage(){var opening=host.closest('.opening');if(!opening||!run){stage=null;return}var or=opening.getBoundingClientRect(),rr=run.getBoundingClientRect();if(!or.width||!rr.width){stage=null;return}stage={ow:or.width,oh:or.height,rx:rr.left-or.left,ry:rr.top-or.top,rw:rr.width,rh:rr.height}}
+function stageBox(){return stage}
 
-/* photo-studio lighting baked into the reflections */
-(function(){
+/* photo-studio lighting baked into the reflections, one frame after the renderer exists */
+var envReady=false,envWait=[];
+function bakeEnv(){
   var s=new T.Scene(),pm=new T.PMREMGenerator(renderer);
   s.add(new T.Mesh(new T.BoxGeometry(60,30,60),new T.MeshBasicMaterial({color:0x04080c,side:T.BackSide})));
   function box(w,h,x,y,z,rx,ry,k,tint){var m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:new T.Color(k*(tint?.8:1),k*(tint?.92:1),k),side:T.DoubleSide}));m.position.set(x,y,z);m.rotation.set(rx,ry,0);s.add(m)}
@@ -24,7 +27,11 @@ function stageBox(){var opening=host.closest('.opening');if(!opening)return null
   box(14,2.6,11,2.6,0,0,-Math.PI/2,2.4,1);box(14,2.6,-11,2.6,0,0,Math.PI/2,1.5,1);
   box(9,3,0,3.2,-13,0,0,2.2,1);box(9,3,0,3.2,13,0,Math.PI,1.6,1);box(60,60,0,-.5,0,-Math.PI/2,0,.05,1);
   scene.environment=pm.fromScene(s,.015).texture;pm.dispose();
-})();
+  envReady=true;
+  var q=envWait;envWait=[];
+  q.forEach(function(fn){fn()});
+}
+requestAnimationFrame(bakeEnv);
 function tex(draw,sz){var c=document.createElement('canvas');c.width=c.height=sz;draw(c.getContext('2d'),sz);var t=new T.CanvasTexture(c);t.encoding=T.sRGBEncoding;return t}
 var soft=tex(function(g,s){var r=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.5,'rgba(255,255,255,.35)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,s,s)},128);
 var floor=new T.Mesh(new T.PlaneGeometry(44,44),new T.MeshBasicMaterial({map:tex(function(g,s){var r=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
@@ -273,9 +280,9 @@ function frame(t){
   if(Math.abs(pr-shownPr)>.004){shownPr=pr;rail.style.setProperty('--p',pr.toFixed(3))}
 }
 var bufW=0,bufH=0,finger=false,fingerT=0;
-function size(){var box=stageBox(),w=box?box.ow:host.clientWidth,h=box?box.oh:host.clientHeight;if(!w||!h)return;w=Math.round(w);h=Math.round(h);if(w===bufW&&Math.abs(h-bufH)<160)return;bufW=w;bufH=h;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();if(ready&&(!vis||calm)){DT=1;frame(calm?LOOP-5:time)}}
+function size(){measureStage();var box=stageBox(),w=box?box.ow:host.clientWidth,h=box?box.oh:host.clientHeight;if(!w||!h)return;w=Math.round(w);h=Math.round(h);if(w===bufW&&Math.abs(h-bufH)<160)return;bufW=w;bufH=h;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();if(ready&&(!vis||calm)){DT=1;frame(calm?LOOP-5:time)}}
 function tick(now){if(!vis)return;DT=Math.min(lite?.034:.028,(now-last)/1000);last=now;time=(time+DT)%LOOP;clock+=DT;frame(time);raf=requestAnimationFrame(tick)}
-function play(on){if(finger)on=false;if(on&&!vis&&ready&&!calm){vis=true;last=performance.now();raf=requestAnimationFrame(tick)}else if(!on){vis=false;cancelAnimationFrame(raf)}}
+function play(on){if(finger)on=false;if(on&&!vis&&ready&&!calm){measureStage();vis=true;last=performance.now();raf=requestAnimationFrame(tick)}else if(!on){vis=false;cancelAnimationFrame(raf)}}
 function noteScroll(){finger=true;clearTimeout(fingerT);if(vis)play(false);fingerT=setTimeout(function(){finger=false;play(seen&&!document.hidden)},140)}
 window.addEventListener('scroll',noteScroll,{passive:true});
 window.addEventListener('resize',size);
@@ -284,6 +291,7 @@ if('IntersectionObserver' in window)new IntersectionObserver(function(en){
   var on=en[0].isIntersecting;if(on)primed=true;seen=on||!primed;play(seen&&!document.hidden);
 },{threshold:0,rootMargin:'12% 0px'}).observe(host);
 document.addEventListener('visibilitychange',function(){play(seen&&!document.hidden)});
+renderer.domElement.addEventListener('webglcontextlost',function(e){e.preventDefault();play(false);ready=false;host.classList.remove('ready')});
 /* test hooks: jump to a time, or simulate a stretch at fixed steps so trails build up; optional fixed camera */
 window.__carSeek=function(t,c){play(false);DT=1;time=t;clock=c||0;frame(t)};
 window.__carRun=function(t0,t1,c0){play(false);var st=1/30,t=t0,c=c0||0;DT=1;time=t;clock=c;frame(t);DT=st;NOR=true;while(t<t1-st){t+=st;c+=st;time=t;clock=c;frame(t)}NOR=false;t+=st;c+=st;time=t;clock=c;frame(t)};
@@ -291,7 +299,10 @@ window.__carView=function(x,y,z,tx,ty,tz,fov){cam.fov=fov||26;cam.updateProjecti
 var NOR=false;
 
 function fail(){host.classList.add('failed')}
-function takeModel(buf){new T.GLTFLoader().parse(buf,'',onModel,fail)}
+function takeModel(buf){
+  var go=function(){requestAnimationFrame(function(){new T.GLTFLoader().parse(buf,'',onModel,fail)})};
+  if(envReady)go();else envWait.push(go);
+}
 var queued=window.__ferrariGlb;
 if(queued&&typeof queued.then=='function')queued.then(takeModel).catch(fail);
 else fetch(host.getAttribute('data-model')).then(function(r){return r.arrayBuffer()}).then(takeModel).catch(fail);

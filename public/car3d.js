@@ -46,7 +46,7 @@ var contact=new T.Mesh(new T.PlaneGeometry(5.6,2.6),new T.MeshBasicMaterial({map
 contact.rotation.x=-Math.PI/2;contact.position.set(0,.004,.15);contact.renderOrder=2;scene.add(contact);
 
 /* ---------- surface shader: dirt, foam, water beads, tool trails, tyre and brake detail ---------- */
-var NT=lite?12:22,trail=[],ti=0;for(var i=0;i<NT;i++)trail.push(new T.Vector4(0,-9,0,0));
+var NT=22,trail=[],ti=0;for(var i=0;i<NT;i++)trail.push(new T.Vector4(0,-9,0,0));
 var U={uDirt:{value:new T.Vector2(1,1)},uFoam:{value:new T.Vector2(0,0)},uWet:{value:new T.Vector2(0,0)},uSweep:{value:9},uLag:{value:0},uTrail:{value:trail},uTrF:{value:0},uTrW:{value:0},uGloss:{value:0},uTyre:{value:new T.Vector2(0,0)}};
 var NOISE='float h31(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}'+
  'float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}'+
@@ -69,7 +69,6 @@ var FX='vec3 wp=vec3(vWP.x,abs(vWP.y),vWP.z);float n1=fbm(wp*3.2),n2=fbm(wp*13.+
  'float fM=smoothstep(0.,.2,foam*1.05-(n1*.55+n2*.45))*(.84+.16*smoothstep(.3,.6,n2));fM*=1.-uTrF*tr*(.55+.3*n3);'+
  'float sud=.74+.26*n3+.14*n2;diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.93,.955,.97)*sud,fM);diffuseColor.a=mix(diffuseColor.a,1.,max(max(fM,dM*.7),bead*.6));float cov=max(fM,dM);';
 function patch(m,kind){
-  if(lite)return m;
   m.onBeforeCompile=function(sh){
     for(var k in U)sh.uniforms[k]=U[k];
     sh.vertexShader='varying vec3 vWP;varying vec3 vWN;\n'+sh.vertexShader.replace('#include <beginnormal_vertex>','#include <beginnormal_vertex>\nvWN=normalize(mat3(modelMatrix)*objectNormal);')
@@ -82,10 +81,10 @@ function patch(m,kind){
       .replace('#include <lights_physical_fragment>','#include <lights_physical_fragment>\n#ifdef USE_CLEARCOAT\nmaterial.clearcoat*=1.-cov;\n#endif');
   };m.customProgramCacheKey=function(){return 'wash'+(kind||'')};m.needsUpdate=true;return m;
 }
-function paint(side){var sideV=side||T.FrontSide;var m=new T.MeshPhysicalMaterial({color:0xb30508,metalness:.35,roughness:.42,clearcoat:1,clearcoatRoughness:.035,envMapIntensity:1.25,side:sideV});return lite?m:patch(m)}
+function paint(side){var sideV=side||T.FrontSide;return patch(new T.MeshPhysicalMaterial({color:0xb30508,metalness:.35,roughness:.42,clearcoat:1,clearcoatRoughness:.035,envMapIntensity:1.25,side:sideV}))}
 var bodyMat=paint(),roofMat=paint(T.DoubleSide);
-var glassMat=lite?new T.MeshPhysicalMaterial({color:0x05080b,metalness:0,roughness:.03,transparent:true,opacity:.72,clearcoat:1,envMapIntensity:1.6}):patch(new T.MeshPhysicalMaterial({color:0x05080b,metalness:0,roughness:.03,transparent:true,opacity:.72,clearcoat:1,envMapIntensity:1.6}));
-var sideGlass=lite?new T.MeshPhysicalMaterial({color:0xb7c9d4,metalness:.05,roughness:.06,transparent:true,opacity:.38,envMapIntensity:1.35,side:T.DoubleSide}):patch(new T.MeshPhysicalMaterial({color:0xb7c9d4,metalness:.05,roughness:.06,transparent:true,opacity:.38,envMapIntensity:1.35,side:T.DoubleSide}));
+var glassMat=patch(new T.MeshPhysicalMaterial({color:0x05080b,metalness:0,roughness:.03,transparent:true,opacity:.72,clearcoat:1,envMapIntensity:1.6}));
+var sideGlass=patch(new T.MeshPhysicalMaterial({color:0xb7c9d4,metalness:.05,roughness:.06,transparent:true,opacity:.38,envMapIntensity:1.35,side:T.DoubleSide}));
 var tyreMat=patch(new T.MeshStandardMaterial({color:0x0b0b0c,roughness:.9,metalness:0,envMapIntensity:.9}),'tyre');
 var discMat=patch(new T.MeshStandardMaterial({color:0x7c8288,roughness:.35,metalness:1,envMapIntensity:1.1}),'disc');
 var alloyMat=patch(new T.MeshStandardMaterial({color:0xa9b0b7,roughness:.2,metalness:1,envMapIntensity:1.25}));

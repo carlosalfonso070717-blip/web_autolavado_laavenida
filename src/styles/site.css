@@ -357,23 +357,21 @@ a.panel--pale{color:var(--ink)}
 /* selection bar */
 .bar{visibility:hidden;position:fixed;left:0;right:0;bottom:0;z-index:50;padding:0 14px calc(14px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;transform:translateY(140%);transition:transform .5s var(--ease),visibility 0s .5s}
 .bar.show{transform:none;visibility:visible;transition-delay:0s}
-.bar-in{pointer-events:auto;background:var(--deep);color:var(--on-deep);box-shadow:0 22px 50px -18px rgba(8,38,63,.65);display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 12px 12px 22px;max-width:760px;width:100%;border-radius:28px;border:1px solid rgba(255,255,255,.08)}
-.bar-txt{flex:1;min-width:0;display:grid;gap:3px;line-height:1.25}
-.bar-txt b{font:800 1.05rem/1.2 var(--body);letter-spacing:0;text-transform:none}
-.bar-txt span{color:var(--on-deep-muted);font-size:.82rem}
-.bar .num{font-size:2.15rem;text-align:right}
-.bar .num::before{content:"Total";display:block;font:700 .62rem/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--on-deep-muted);margin-bottom:4px}
-.bar .btn{background:#fff;color:var(--deep);border-radius:999px;min-height:48px;padding:12px 18px;font-weight:700}
-.bar .clear{background:none;border:0;color:var(--on-deep-muted);cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:.82rem;padding:4px 8px}
-@media(max-width:640px){
-  .bar-in{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px 12px;padding:14px 14px 12px;border-radius:24px}
-  .bar .btn{grid-column:1/-1;width:100%}
-  .bar .clear{grid-column:1/-1;justify-self:center}
-}
-body:has(.bar.show) footer{padding-bottom:150px}
+.bar-in{pointer-events:auto;background:var(--deep);color:var(--on-deep);box-shadow:0 22px 50px -18px rgba(8,38,63,.65);display:flex;align-items:center;flex-wrap:nowrap;gap:8px;padding:6px 6px 6px 16px;max-width:760px;width:100%;border-radius:999px;border:1px solid rgba(255,255,255,.08)}
+.bar-txt{flex:1;min-width:0;display:grid;gap:1px;line-height:1.15}
+.bar-txt b,.bar-txt span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-txt b{font:800 .92rem/1.2 var(--body);letter-spacing:0;text-transform:none}
+.bar-txt span{color:var(--on-deep-muted);font-size:.72rem}
+.bar .num{flex:none;font-size:1.15rem;text-align:right;white-space:nowrap}
+.bar .num::before{content:none}
+.bar .btn{flex:none;background:#fff;color:var(--deep);border-radius:999px;min-height:44px;padding:8px 14px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.bar .btn svg{width:18px;height:18px;display:block;fill:#25D366}
+.bar .clear{flex:none;width:44px;height:44px;border:0;border-radius:50%;background:#e11d2e;color:#fff;cursor:pointer;display:grid;place-items:center;padding:0}
+.bar .clear svg{width:20px;height:20px;display:block}
+body:has(.bar.show) footer{padding-bottom:108px}
 .wa-float{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;width:112px;height:112px;display:grid;place-items:center;pointer-events:none}
 @media (min-width:640px){.wa-float{right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px))}}
-body:has(.bar.show) .wa-float{bottom:calc(112px + env(safe-area-inset-bottom,0px))}
+body:has(.bar.show) .wa-float{visibility:hidden;opacity:0;pointer-events:none}
 .wa-ring{grid-area:1/1;width:56px;height:56px;border-radius:50%;background:#25D366;animation:wa-breathe 2.4s ease-out infinite}
 .wa-ring:nth-child(2){animation-delay:1.2s}
 .wa-float a{pointer-events:auto;position:relative;z-index:1;grid-area:1/1;width:56px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#25D366;color:#fff;box-shadow:0 8px 24px -8px rgba(18,140,126,.7);transition:background-color .15s ease,transform .15s ease}
@@ -566,8 +564,9 @@ footer .wrap{display:grid;gap:24px}
   .contact{padding-block:72px 88px}
   .form{padding:28px 22px;gap:26px}
   .wa-float{right:16px}  footer{padding-block:28px 36px}
-  .bar-in{padding:12px 14px}
-  .bar .num{font-size:2rem}
+  .bar{padding:0 10px calc(10px + env(safe-area-inset-bottom,0px))}
+  .bar-in{padding:6px 6px 6px 12px;gap:6px}
+  .bar .num{font-size:1.05rem}
   .x{grid-template-columns:auto 1fr}
   .x .num{grid-row:auto;grid-column:2;font-size:1.7rem}
   .x p{grid-column:2}

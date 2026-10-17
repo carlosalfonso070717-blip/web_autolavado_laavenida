@@ -410,7 +410,11 @@ footer .wrap{display:grid;gap:24px}
 .hero-copy{order:1}
 .opening .cta{order:3}
 .washrun{order:2;position:static;z-index:1;width:min(1080px,100%);flex:1 1 auto;min-height:0;display:block;background:transparent;pointer-events:none}
-@media(max-width:860px){.washrun{flex:none;width:100%;height:auto;aspect-ratio:2.35/1}}
+@media(max-width:860px){
+  .washrun{position:relative;flex:none;width:100%;height:auto;aspect-ratio:2.35/1}
+  .stage{position:relative;height:100%}
+  .sk-ferrari{left:4%;top:50%;width:92%;transform:translateY(-54%)}
+}
 .stage{position:static;overflow:visible;display:block;background:transparent}
 .caps,.scrim,.rail,.stage>.wrap{display:none}
 .cap{position:absolute;inset:0 clamp(16px,4.5vw,56px) auto;display:grid;gap:6px;align-content:start;opacity:0;transform:translateY(18px);transition:opacity .5s,transform .6s var(--ease);pointer-events:none}

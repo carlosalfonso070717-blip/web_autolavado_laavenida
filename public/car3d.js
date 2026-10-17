@@ -4,8 +4,8 @@ var host=document.getElementById('car3d');if(!host||!window.THREE)return;
 var T=THREE,calm=matchMedia('(prefers-reduced-motion: reduce)').matches,renderer;
 var small=Math.min(window.innerWidth,window.innerHeight)<700;
 var lite=small||matchMedia('(pointer: coarse)').matches||(navigator.hardwareConcurrency||8)<=4;
-function pixelRatio(){var dpr=window.devicePixelRatio||1,edge=Math.max(host.clientWidth,host.clientHeight,1);if(!lite)return Math.max(.7,Math.min(dpr,1500/edge,1.25));return Math.min(dpr,1,800/edge)}
-try{renderer=new T.WebGLRenderer({antialias:!lite,powerPreference:lite?'default':'high-performance',alpha:true,preserveDrawingBuffer:false})}catch(e){return}
+function pixelRatio(){var dpr=window.devicePixelRatio||1,edge=Math.max(host.clientWidth,host.clientHeight,1);if(!lite)return Math.max(.7,Math.min(dpr,1500/edge,1.25));return Math.min(dpr,3)}
+try{renderer=new T.WebGLRenderer({antialias:true,powerPreference:lite?'default':'high-performance',alpha:true,preserveDrawingBuffer:false})}catch(e){return}
 var run=document.getElementById('washrun'),caps=[].slice.call(run.querySelectorAll('.cap')),rail=document.getElementById('rail'),ticks=[].slice.call(rail.querySelectorAll('span'));
 renderer.setPixelRatio(pixelRatio());
 renderer.setClearColor(0x000000,0);
@@ -82,10 +82,10 @@ function patch(m,kind){
       .replace('#include <lights_physical_fragment>','#include <lights_physical_fragment>\n#ifdef USE_CLEARCOAT\nmaterial.clearcoat*=1.-cov;\n#endif');
   };m.customProgramCacheKey=function(){return 'wash'+(kind||'')};m.needsUpdate=true;return m;
 }
-function paint(side){return patch(new T.MeshPhysicalMaterial({color:0xb30508,metalness:.35,roughness:.42,clearcoat:1,clearcoatRoughness:.035,envMapIntensity:1.25,side:side||T.FrontSide}))}
+function paint(side){var sideV=side||T.FrontSide;if(lite)return new T.MeshStandardMaterial({color:0xb30508,metalness:.45,roughness:.38,side:sideV});return patch(new T.MeshPhysicalMaterial({color:0xb30508,metalness:.35,roughness:.42,clearcoat:1,clearcoatRoughness:.035,envMapIntensity:1.25,side:sideV}))}
 var bodyMat=paint(),roofMat=paint(T.DoubleSide);
-var glassMat=patch(new T.MeshPhysicalMaterial({color:0x05080b,metalness:0,roughness:.03,transparent:true,opacity:.72,clearcoat:1,envMapIntensity:1.6}));
-var sideGlass=patch(new T.MeshPhysicalMaterial({color:0xb7c9d4,metalness:.05,roughness:.06,transparent:true,opacity:.38,envMapIntensity:1.35,side:T.DoubleSide}));
+var glassMat=lite?new T.MeshStandardMaterial({color:0x05080b,metalness:0,roughness:.08,transparent:true,opacity:.72}):patch(new T.MeshPhysicalMaterial({color:0x05080b,metalness:0,roughness:.03,transparent:true,opacity:.72,clearcoat:1,envMapIntensity:1.6}));
+var sideGlass=lite?new T.MeshStandardMaterial({color:0xb7c9d4,metalness:.05,roughness:.08,transparent:true,opacity:.38,side:T.DoubleSide}):patch(new T.MeshPhysicalMaterial({color:0xb7c9d4,metalness:.05,roughness:.06,transparent:true,opacity:.38,envMapIntensity:1.35,side:T.DoubleSide}));
 var tyreMat=patch(new T.MeshStandardMaterial({color:0x0b0b0c,roughness:.9,metalness:0,envMapIntensity:.9}),'tyre');
 var discMat=patch(new T.MeshStandardMaterial({color:0x7c8288,roughness:.35,metalness:1,envMapIntensity:1.1}),'disc');
 var alloyMat=patch(new T.MeshStandardMaterial({color:0xa9b0b7,roughness:.2,metalness:1,envMapIntensity:1.25}));
@@ -136,7 +136,8 @@ function wheelParts(car){
     g.position.set(s*.62,.36,z+(front?.02:-.02));g.rotation.z=s*.32;car.add(g)});
 }
 
-/* ---------- hand tools (no people) ---------- */
+/* ---------- hand tools (no people). On a phone the car only turns; these meshes are what freeze the page. ---------- */
+if(!lite){
 var dark=new T.MeshStandardMaterial({color:0x14181d,roughness:.45,metalness:.3}),steel=new T.MeshStandardMaterial({color:0xc2c8cd,roughness:.2,metalness:1}),blue=new T.MeshStandardMaterial({color:0x1f86d1,roughness:.4,metalness:.2}),rubber=new T.MeshStandardMaterial({color:0x0c0d0f,roughness:.8,metalness:0});
 function part(g,m,x,y,z,rx){var o=new T.Mesh(g,m);o.position.set(x,y,z);if(rx)o.rotation.x=rx;o.renderOrder=6;return o}
 var gun=new T.Group(),H=Math.PI/2;
@@ -202,6 +203,7 @@ var bottleG=new T.Group();(function(){
 var NZ2=70,zp=new Float32Array(NZ2*3),zgeo=new T.BufferGeometry();zgeo.setAttribute('position',new T.BufferAttribute(zp,3));
 var spritzMat=new T.PointsMaterial({size:.06,map:soft,transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending,color:0xcfe9fb}),spritz=new T.Points(zgeo,spritzMat);spritz.frustumCulled=false;spritz.renderOrder=7;spritz.visible=false;scene.add(spritz);
 var XAX=new T.Vector3(1,0,0);
+}
 /* tools ride on the real bodywork: cast a ray at the body, then glide toward the hit so the motion stays fluid */
 var ray=new T.Raycaster(),bodyMesh=null,hitList=[],NM=new T.Matrix3(),ZAX=new T.Vector3(0,0,1),QN=new T.Quaternion(),QS=new T.Quaternion(),O=new T.Vector3(),DIR=new T.Vector3(),N=new T.Vector3(),DT=1,castAcc=0,allowCast=true;
 function cast(o,d){ray.set(o,d);var h=ray.intersectObjects(hitList,false)[0];if(!h)return null;N.copy(h.face.normal);if(h.object===bodyMesh)N.applyMatrix3(NM);N.normalize();if(N.dot(d)>0)N.negate();return h}
@@ -218,7 +220,19 @@ function mark(obj){var ud=obj.userData;if(!ud.ok)return;trail[ti].set(ud.hit.x,u
 var ready=false,LOOP=38,time=0,clock=0,last=0,vis=false,raf=0,ZS=2.9,shownCap=-1,shownPr=-1;
 /* 0 arrives · 1 pressure pre-wash · 2 foam · 3 sponge · 4 rinse · 5 towels · 6 shine, then the dust settles back */
 var CUT=[0,2.2,6.4,9.8,15.2,19.4,25,30.2,LOOP],CAP=[0,1,2,2,3,4,5,5],CS=[0,2.2,6.4,15.2,19.4,25],CE=[2.2,6.4,15.2,19.4,25,30.2],lastPh=-1;
+function liteFrame(){
+  var ow=Math.max(host.clientWidth,1),oh=Math.max(host.clientHeight,1);
+  var asp=ow/oh,vFov=cam.fov*Math.PI/180,hFov=2*Math.atan(Math.tan(vFov/2)*Math.max(asp,.2));
+  var th=Math.PI/2+.16*Math.sin(clock*.4),s=Math.abs(Math.sin(th)),c=Math.abs(Math.cos(th));
+  var ox=carCenter.x,oy=carCenter.y*.72,oz=carCenter.z,halfW=carSize.z*.5*s+carSize.x*.5*c,halfH=carSize.y*.55;
+  if(bodyBox){ox=(bodyBox.min.x+bodyBox.max.x)*.5;oy=(bodyBox.min.y+bodyBox.max.y)*.5;oz=(bodyBox.min.z+bodyBox.max.z)*.5;halfW=(bodyBox.max.z-bodyBox.min.z)*.5*s+(bodyBox.max.x-bodyBox.min.x)*.5*c;halfH=(bodyBox.max.y-bodyBox.min.y)*.5}
+  var dist=Math.max(halfW/Math.tan(hFov/2),halfH/Math.tan(vFov/2))*1.18;
+  cam.position.set(ox+Math.sin(th)*dist,oy+halfH*.2,oz+Math.cos(th)*dist);
+  cam.lookAt(ox,oy,oz);
+  renderer.render(scene,cam);
+}
 function frame(t){
+  if(lite){liteFrame();return}
   castAcc+=DT;allowCast=castAcc>(lite?.05:.033);if(allowCast)castAcc=0;
   var ph=0;while(ph<7&&t>=CUT[ph+1])ph++;
   var u=(t-CUT[ph])/(CUT[ph+1]-CUT[ph]),e=sm(u),back=sm((t-(LOOP-2.4))/2.4),io=sm(u*7)*sm((1-u)*7),sweep=ZS-2*ZS*e,n;
@@ -283,7 +297,7 @@ function frame(t){
   if(Math.abs(pr-shownPr)>.004){shownPr=pr;rail.style.setProperty('--p',pr.toFixed(3))}
 }
 var bufW=0,bufH=0,finger=false,fingerT=0;
-function size(){measureStage();var box=stageBox(),w=box?box.ow:host.clientWidth,h=box?box.oh:host.clientHeight;if(!w||!h)return;w=Math.round(w);h=Math.round(h);if(w===bufW&&Math.abs(h-bufH)<160)return;bufW=w;bufH=h;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();if(ready&&(!vis||calm)){DT=1;frame(calm?LOOP-5:time)}}
+function size(){measureStage();var box=stageBox(),w=lite?host.clientWidth:(box?box.ow:host.clientWidth),h=lite?host.clientHeight:(box?box.oh:host.clientHeight);if(!w||!h)return;w=Math.round(w);h=Math.round(h);if(w===bufW&&Math.abs(h-bufH)<160)return;bufW=w;bufH=h;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();if(ready&&(!vis||calm)){DT=1;frame(calm?LOOP-5:time)}}
 function tick(now){if(!vis)return;DT=Math.min(lite?.034:.028,(now-last)/1000);last=now;time=(time+DT)%LOOP;clock+=DT;frame(time);raf=requestAnimationFrame(tick)}
 function play(on){if(finger||sheetHold)on=false;if(on&&!vis&&ready&&!calm){measureStage();vis=true;last=performance.now();raf=requestAnimationFrame(tick)}else if(!on){vis=false;cancelAnimationFrame(raf)}}
 var sheetHold=false;
@@ -305,7 +319,7 @@ var NOR=false;
 
 function fail(){host.classList.add('failed')}
 function takeModel(buf){
-  requestAnimationFrame(function(){new T.GLTFLoader().parse(buf,'',onModel,fail)});
+  setTimeout(function(){new T.GLTFLoader().parse(buf,'',onModel,fail)},1);
 }
 var queued=window.__ferrariGlb;
 if(queued&&typeof queued.then=='function')queued.then(takeModel).catch(fail);
@@ -327,7 +341,7 @@ function onModel(gltf){
       else if(mn=='Taillight_Glass'){m.emissive=new T.Color(0x5a0000);m.roughness=.15}
       else if(mn=='Projector_Glass'){m.transparent=true;m.opacity=.55;m.roughness=.05;m.metalness=.4}
       m.envMapIntensity=1.1}});
-  var hard=buildRoof();car.add(hard);wheelParts(car);car.traverse(function(o){o.renderOrder=3});scene.add(car);car.updateMatrixWorld(true);
+  var hard=buildRoof();car.add(hard);if(!lite)wheelParts(car);car.traverse(function(o){o.renderOrder=3});scene.add(car);car.updateMatrixWorld(true);
   var fit=new T.Box3().setFromObject(car);fit.getCenter(carCenter);fit.getSize(carSize);
   if(bodyMesh){bodyMesh.updateWorldMatrix(true,false);bodyMesh.geometry.computeBoundingBox();bodyBox=bodyMesh.geometry.boundingBox.clone().applyMatrix4(bodyMesh.matrixWorld)}
   if(bodyMesh){NM.getNormalMatrix(bodyMesh.matrixWorld);hitList=[bodyMesh,hard.userData.roof]}

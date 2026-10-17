@@ -4,7 +4,7 @@ var host=document.getElementById('car3d');if(!host||!window.THREE)return;
 var T=THREE,calm=matchMedia('(prefers-reduced-motion: reduce)').matches,renderer;
 var small=Math.min(window.innerWidth,window.innerHeight)<700;
 var lite=small||matchMedia('(pointer: coarse)').matches||(navigator.hardwareConcurrency||8)<=4;
-function pixelRatio(){var dpr=window.devicePixelRatio||1,edge=Math.max(host.clientWidth,host.clientHeight,1);if(!lite)return Math.max(.7,Math.min(dpr,1500/edge,1.25));return Math.max(.75,Math.min(dpr,1.15,900/edge))}
+function pixelRatio(){var dpr=window.devicePixelRatio||1,edge=Math.max(host.clientWidth,host.clientHeight,1);if(!lite)return Math.max(.7,Math.min(dpr,1500/edge,1.25));return Math.min(dpr,1,800/edge)}
 try{renderer=new T.WebGLRenderer({antialias:!lite,powerPreference:lite?'default':'high-performance',alpha:true,preserveDrawingBuffer:false})}catch(e){return}
 var run=document.getElementById('washrun'),caps=[].slice.call(run.querySelectorAll('.cap')),rail=document.getElementById('rail'),ticks=[].slice.call(rail.querySelectorAll('span'));
 renderer.setPixelRatio(pixelRatio());
@@ -69,6 +69,7 @@ var FX='vec3 wp=vec3(vWP.x,abs(vWP.y),vWP.z);float n1=fbm(wp*3.2),n2=fbm(wp*13.+
  'float fM=smoothstep(0.,.2,foam*1.05-(n1*.55+n2*.45))*(.84+.16*smoothstep(.3,.6,n2));fM*=1.-uTrF*tr*(.55+.3*n3);'+
  'float sud=.74+.26*n3+.14*n2;diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.93,.955,.97)*sud,fM);diffuseColor.a=mix(diffuseColor.a,1.,max(max(fM,dM*.7),bead*.6));float cov=max(fM,dM);';
 function patch(m,kind){
+  if(lite)return m;
   m.onBeforeCompile=function(sh){
     for(var k in U)sh.uniforms[k]=U[k];
     sh.vertexShader='varying vec3 vWP;varying vec3 vWN;\n'+sh.vertexShader.replace('#include <beginnormal_vertex>','#include <beginnormal_vertex>\nvWN=normalize(mat3(modelMatrix)*objectNormal);')
@@ -336,13 +337,14 @@ function onModel(gltf){
   function reveal(){
     if(shown)return;shown=true;
     lastPh=-1;shownCap=-1;shownPr=-1;time=0;clock=0;
-    ready=true;DT=1;frame(calm?LOOP-5:0);
+    ready=true;DT=1;
+    try{frame(calm?LOOP-5:0)}catch(err){}
     host.classList.add('ready');
-    if(lite&&!envReady)requestAnimationFrame(bakeEnv);
     if(!calm)play(seen&&!document.hidden);
   }
   function warmStep(){
-    lastPh=-1;frame(warm[wi]);wi++;
+    try{lastPh=-1;frame(warm[wi])}catch(err){}
+    wi++;
     if(wi>=(lite?1:2))reveal();
     if(wi<warm.length){requestAnimationFrame(warmStep);return}
   }

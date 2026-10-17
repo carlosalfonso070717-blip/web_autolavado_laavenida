@@ -340,6 +340,9 @@ if(gl){
   }
 }
 }
-if(window.requestIdleCallback)requestIdleCallback(startWater,{timeout:500});
-else requestAnimationFrame(startWater);
+var phone=matchMedia('(max-width:860px)').matches||matchMedia('(pointer: coarse)').matches;
+if(!phone){
+  if(window.requestIdleCallback)requestIdleCallback(startWater,{timeout:500});
+  else requestAnimationFrame(startWater);
+}
 }

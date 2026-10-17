@@ -4,8 +4,8 @@ var host=document.getElementById('car3d');if(!host||!window.THREE)return;
 var T=THREE,calm=matchMedia('(prefers-reduced-motion: reduce)').matches,renderer;
 var small=Math.min(window.innerWidth,window.innerHeight)<700;
 var lite=small||matchMedia('(pointer: coarse)').matches||(navigator.hardwareConcurrency||8)<=4;
-function pixelRatio(){var dpr=window.devicePixelRatio||1,edge=Math.max(host.clientWidth,host.clientHeight,1);if(!lite)return Math.max(.7,Math.min(dpr,1500/edge,1.25));return Math.max(1,Math.min(dpr,3,2800/edge))}
-try{renderer=new T.WebGLRenderer({antialias:!lite,powerPreference:'high-performance',alpha:true,preserveDrawingBuffer:false})}catch(e){return}
+function pixelRatio(){var dpr=window.devicePixelRatio||1,edge=Math.max(host.clientWidth,host.clientHeight,1);if(!lite)return Math.max(.7,Math.min(dpr,1500/edge,1.25));return Math.max(.75,Math.min(dpr,1.15,900/edge))}
+try{renderer=new T.WebGLRenderer({antialias:!lite,powerPreference:lite?'default':'high-performance',alpha:true,preserveDrawingBuffer:false})}catch(e){return}
 var run=document.getElementById('washrun'),caps=[].slice.call(run.querySelectorAll('.cap')),rail=document.getElementById('rail'),ticks=[].slice.call(rail.querySelectorAll('span'));
 renderer.setPixelRatio(pixelRatio());
 renderer.setClearColor(0x000000,0);
@@ -26,12 +26,14 @@ function bakeEnv(){
   box(4.2,13,0,7.5,0,Math.PI/2,0,7);box(.9,15,5.2,6.2,0,Math.PI/2,0,10);box(.9,15,-5.2,6.2,0,Math.PI/2,0,10);
   box(14,2.6,11,2.6,0,0,-Math.PI/2,2.4,1);box(14,2.6,-11,2.6,0,0,Math.PI/2,1.5,1);
   box(9,3,0,3.2,-13,0,0,2.2,1);box(9,3,0,3.2,13,0,Math.PI,1.6,1);box(60,60,0,-.5,0,-Math.PI/2,0,.05,1);
-  scene.environment=pm.fromScene(s,.015).texture;pm.dispose();
+  scene.environment=pm.fromScene(s,lite?.04:.015).texture;pm.dispose();
   envReady=true;
   var q=envWait;envWait=[];
   q.forEach(function(fn){fn()});
 }
-requestAnimationFrame(bakeEnv);
+scene.add(new T.HemisphereLight(0xd7e7f2,0x071018,lite?1.35:.55));
+var key=new T.DirectionalLight(0xffffff,lite?1.6:.35);key.position.set(4,6,3);scene.add(key);
+if(!lite)requestAnimationFrame(bakeEnv);
 function tex(draw,sz){var c=document.createElement('canvas');c.width=c.height=sz;draw(c.getContext('2d'),sz);var t=new T.CanvasTexture(c);t.encoding=T.sRGBEncoding;return t}
 var soft=tex(function(g,s){var r=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.5,'rgba(255,255,255,.35)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,s,s)},128);
 var floor=new T.Mesh(new T.PlaneGeometry(44,44),new T.MeshBasicMaterial({map:tex(function(g,s){var r=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
@@ -282,7 +284,9 @@ function frame(t){
 var bufW=0,bufH=0,finger=false,fingerT=0;
 function size(){measureStage();var box=stageBox(),w=box?box.ow:host.clientWidth,h=box?box.oh:host.clientHeight;if(!w||!h)return;w=Math.round(w);h=Math.round(h);if(w===bufW&&Math.abs(h-bufH)<160)return;bufW=w;bufH=h;renderer.setPixelRatio(pixelRatio());renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();if(ready&&(!vis||calm)){DT=1;frame(calm?LOOP-5:time)}}
 function tick(now){if(!vis)return;DT=Math.min(lite?.034:.028,(now-last)/1000);last=now;time=(time+DT)%LOOP;clock+=DT;frame(time);raf=requestAnimationFrame(tick)}
-function play(on){if(finger)on=false;if(on&&!vis&&ready&&!calm){measureStage();vis=true;last=performance.now();raf=requestAnimationFrame(tick)}else if(!on){vis=false;cancelAnimationFrame(raf)}}
+function play(on){if(finger||sheetHold)on=false;if(on&&!vis&&ready&&!calm){measureStage();vis=true;last=performance.now();raf=requestAnimationFrame(tick)}else if(!on){vis=false;cancelAnimationFrame(raf)}}
+var sheetHold=false;
+document.addEventListener('lav-sheet',function(e){sheetHold=!!e.detail;if(sheetHold)play(false);else play(seen&&!document.hidden)});
 function noteScroll(){finger=true;clearTimeout(fingerT);if(vis)play(false);fingerT=setTimeout(function(){finger=false;play(seen&&!document.hidden)},140)}
 window.addEventListener('scroll',noteScroll,{passive:true});
 window.addEventListener('resize',size);
@@ -300,8 +304,7 @@ var NOR=false;
 
 function fail(){host.classList.add('failed')}
 function takeModel(buf){
-  var go=function(){requestAnimationFrame(function(){new T.GLTFLoader().parse(buf,'',onModel,fail)})};
-  if(envReady)go();else envWait.push(go);
+  requestAnimationFrame(function(){new T.GLTFLoader().parse(buf,'',onModel,fail)});
 }
 var queued=window.__ferrariGlb;
 if(queued&&typeof queued.then=='function')queued.then(takeModel).catch(fail);
@@ -329,14 +332,19 @@ function onModel(gltf){
   if(bodyMesh){NM.getNormalMatrix(bodyMesh.matrixWorld);hitList=[bodyMesh,hard.userData.roof]}
   size();
   DT=1;allowCast=true;
-  var warm=[0,4,8,12,17,22,27],wi=0;
-  function warmStep(){
-    lastPh=-1;frame(warm[wi]);wi++;
-    if(wi<warm.length){requestAnimationFrame(warmStep);return}
+  var warm=lite?[0,12,27]:[0,4,8,12,17,22,27],wi=0,shown=false;
+  function reveal(){
+    if(shown)return;shown=true;
     lastPh=-1;shownCap=-1;shownPr=-1;time=0;clock=0;
     ready=true;DT=1;frame(calm?LOOP-5:0);
     host.classList.add('ready');
+    if(lite&&!envReady)requestAnimationFrame(bakeEnv);
     if(!calm)play(seen&&!document.hidden);
+  }
+  function warmStep(){
+    lastPh=-1;frame(warm[wi]);wi++;
+    if(wi>=(lite?1:2))reveal();
+    if(wi<warm.length){requestAnimationFrame(warmStep);return}
   }
   requestAnimationFrame(warmStep);
 }

@@ -14,8 +14,6 @@ function loadScript(src) {
 }
 
 export async function loadCar() {
-  var small = Math.min(window.innerWidth, window.innerHeight) < 700
-  if (small || matchMedia('(pointer: coarse)').matches || (navigator.hardwareConcurrency || 8) <= 4) return
   if (document.querySelector('#car3d canvas')) return
   const base = 'https://cdn.jsdelivr.net/npm/three@0.147.0'
   await loadScript(`${base}/build/three.min.js`)

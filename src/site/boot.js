@@ -102,7 +102,7 @@ document.addEventListener('click',function(e){
   var t=e.target.closest('[data-veh-set]');if(t){S.veh=+t.dataset.vehSet;update();closePicks()}
   else if(!e.target.closest('.vehpick'))closePicks();
   t=e.target.closest('[data-pick]');if(t){var i=+t.dataset.pick;S.wash=S.wash==i?null:i;update()}
-  t=e.target.closest('[data-go]');if(t)go(t.dataset.go,t.dataset.scroll);
+  t=e.target.closest('[data-go]');if(t){if(t.tagName==='A')e.preventDefault();go(t.dataset.go,t.dataset.scroll)}
 });
 document.addEventListener('change',function(e){var id=e.target.dataset&&e.target.dataset.x;if(id!=null){if(e.target.checked)S.extras[id]=1;else delete S.extras[id];update()}});
 function openWhatsApp(text){window.open('https://wa.me/529993394611?text='+encodeURIComponent(text),'_blank','noopener,noreferrer')}
@@ -127,7 +127,7 @@ document.addEventListener('click',function(e){
 
 /* ---------- pages + water sheet transition ---------- */
 var cur='inicio',busy=false,WT={force:false},wrap=$('#waterWrap'),tw=$('#tword');
-function show(name,scrollId){
+function show(name,scrollId,mode){
   $$('[data-view]').forEach(function(v){v.hidden=v.dataset.view!=name});
   cur=name;
   closeMenu();
@@ -138,8 +138,43 @@ function show(name,scrollId){
   root.style.scrollBehavior='auto';
   window.scrollTo(0,el?el.getBoundingClientRect().top+scrollY-108:0);
   root.style.scrollBehavior=prev;
-  try{history.replaceState(null,'','#'+name)}catch(_){}
+  writeUrl(name,mode||'push');
   placeNav();
+}
+var PAGES={
+  inicio:{path:'/',title:'Club de Autolavado La Avenida | Campestre, Yucatán',desc:'Club de Autolavado La Avenida en Campestre, Yucatán. Lavado a mano, secado con microfibra y detallado. Lunes a sábado de 8:00 a. m. a 5:00 p. m.'},
+  lavados:{path:'/lavados',title:'Lavados | Club de Autolavado La Avenida',desc:'Lavado Express, Completo y Deluxe en Campestre, Yucatán. El precio cambia según tu vehículo. Lunes a sábado de 8:00 a. m. a 5:00 p. m.'},
+  adicionales:{path:'/adicionales',title:'Servicios adicionales | Club de Autolavado La Avenida',desc:'Quince servicios de detallado, interiores y ceras en Campestre, Yucatán. Súmalos al lavado y ve el total según tu vehículo.'}
+};
+function viewFromLocation(){
+  var hash=(location.hash||'').replace(/^#/,'');
+  if(hash==='lavados'||hash==='adicionales')return hash;
+  var path=(location.pathname||'/').replace(/\/+$/,'')||'/';
+  if(path==='/lavados')return 'lavados';
+  if(path==='/adicionales')return 'adicionales';
+  return 'inicio';
+}
+function setMeta(name){
+  var p=PAGES[name]||PAGES.inicio,url='https://clublaavenida.com.mx'+p.path;
+  document.title=p.title;
+  var d=document.querySelector('meta[name="description"]');if(d)d.setAttribute('content',p.desc);
+  var c=document.querySelector('link[rel="canonical"]');if(c)c.setAttribute('href',url);
+  var og=document.querySelector('meta[property="og:url"]');if(og)og.setAttribute('content',url);
+  var ogt=document.querySelector('meta[property="og:title"]');if(ogt)ogt.setAttribute('content',p.title);
+  var ogd=document.querySelector('meta[property="og:description"]');if(ogd)ogd.setAttribute('content',p.desc);
+  var twt=document.querySelector('meta[name="twitter:title"]');if(twt)twt.setAttribute('content',p.title);
+  var twd=document.querySelector('meta[name="twitter:description"]');if(twd)twd.setAttribute('content',p.desc);
+}
+function writeUrl(name,mode){
+  var path=(PAGES[name]||PAGES.inicio).path;
+  var here=(location.pathname||'/').replace(/\/+$/,'')||'/';
+  var same=here===path&&!location.hash;
+  setMeta(name);
+  if(mode==='stay'||same){
+    if(!same)try{history.replaceState({view:name},'',path)}catch(_){}
+    return;
+  }
+  try{history[mode==='push'?'pushState':'replaceState']({view:name},'',path)}catch(_){}
 }
 var NAV_SECS=['servicios','nosotros','info','faq','contacto'];
 function placeNav(){
@@ -153,7 +188,7 @@ function placeNav(){
       if(el&&el.getBoundingClientRect().top+scrollY<=line)id=s;
     });
   }
-  $$('#menu button').forEach(function(b){
+  $$('#menu [data-go]').forEach(function(b){
     if(b.closest('.dd-panel'))return;
     var key=b.dataset.scroll||b.dataset.nav;
     if(key==id)b.setAttribute('aria-current','page');
@@ -164,42 +199,59 @@ var navTick=0;
 window.addEventListener('scroll',function(){if(navTick)return;navTick=requestAnimationFrame(function(){navTick=0;placeNav()})},{passive:true});
 function io(k){return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2}
 /* a sheet of water with a wavy foam crest: top edge at T, bottom edge at B (fractions of the screen) */
-function sheet(T,B,ph){
-  var vv=window.visualViewport,H=vv?vv.height:innerHeight,W=vv?vv.width:innerWidth,A=Math.min(34,W*.03),n=18,pts=[],i,x;
+function sheet(T,B,ph,lite){
+  var vv=window.visualViewport,H=vv?vv.height:innerHeight,W=vv?vv.width:innerWidth,A=Math.min(lite?18:34,W*.03),n=lite?8:18,pts=[],i,x;
   for(i=0;i<=n;i++){x=i/n*W;pts.push(x.toFixed(0)+'px '+(T*H+Math.sin(i*.9+ph)*A+Math.sin(i*.37-ph*1.3)*A*.6).toFixed(1)+'px')}
   for(i=n;i>=0;i--){x=i/n*W;pts.push(x.toFixed(0)+'px '+(B*H+Math.sin(i*.8-ph)*A+Math.sin(i*.31+ph*1.2)*A*.6).toFixed(1)+'px')}
   wrap.style.clipPath='polygon('+pts.join(',')+')';
 }
-var sheetGen=0,sheetTimer=0,uncoverTimer=0;
+var sheetGen=0,sheetTimer=0,uncoverTimer=0,sheetGo=null;
 function phase(from,to,dur,fn,done){
-  var gen=sheetGen,t0=performance.now();
-  (function st(t){
+  var gen=sheetGen,t0=performance.now(),live=0;
+  function st(){
     if(gen!==sheetGen)return;
-    var k=Math.min((t-t0)/dur,1);
-    fn(from+(to-from)*io(k),t/260,k);
+    var now=performance.now(),k=Math.min((now-t0)/dur,1);
+    fn(from+(to-from)*io(k),now/260,k);
     if(gen!==sheetGen)return;
-    if(k<1)requestAnimationFrame(st);else done&&done();
-  })(t0);
+    if(k<1){
+      var ticket=++live;
+      requestAnimationFrame(function(){if(ticket===live)st()});
+      setTimeout(function(){if(ticket===live)st()},48);
+    }else{live++;done&&done()}
+  }
+  st();
 }
 function releaseSheet(){
   sheetGen++;
   clearTimeout(sheetTimer);
   clearTimeout(uncoverTimer);
   wrap.classList.remove('over');wrap.style.clipPath='';tw.style.opacity=0;WT.force=false;busy=false;
+  document.dispatchEvent(new CustomEvent('lav-sheet',{detail:false}));
 }
 function uncover(done){
-  phase(1.12,-.14,900,function(B,ph,k){sheet(-.14,B,ph);tw.style.opacity=Math.max(0,1-k*2.4)},function(){releaseSheet();done&&done()});
+  var lite=sheetLite();
+  phase(1.12,-.14,lite?620:900,function(B,ph,k){sheet(-.14,B,ph,lite);tw.style.opacity=Math.max(0,1-k*2.4)},function(){releaseSheet();done&&done()});
 }
+function sheetLite(){return matchMedia('(max-width:860px)').matches||matchMedia('(pointer: coarse)').matches}
 function go(name,scrollId){
-  if(busy){releaseSheet();show(name,scrollId);return}
+  if(busy){sheetGo=null;releaseSheet();show(name,scrollId);return}
   if(name==cur){var el=scrollId&&document.getElementById(scrollId);window.scrollTo({top:el?el.getBoundingClientRect().top+scrollY-108:0,behavior:calm?'auto':'smooth'});$('#menu').classList.remove('open');return}
   if(calm){show(name,scrollId);return}
-  busy=true;WT.force=true;WT.once=true;wrap.classList.add('over');
-  clearTimeout(sheetTimer);sheetTimer=setTimeout(releaseSheet,2400);
-  phase(1.14,-.14,760,function(T,ph,k){sheet(T,1.14,ph);tw.style.opacity=Math.max(0,k*2-1)},function(){show(name,scrollId);clearTimeout(uncoverTimer);uncoverTimer=setTimeout(uncover,140)});
+  var lite=sheetLite();
+  busy=true;sheetGo={n:name,id:scrollId};WT.force=!lite;WT.once=true;wrap.classList.add('over');
+  document.dispatchEvent(new CustomEvent('lav-sheet',{detail:true}));
+  clearTimeout(sheetTimer);
+  sheetTimer=setTimeout(function(){var dest=sheetGo;sheetGo=null;releaseSheet();if(dest)show(dest.n,dest.id)},lite?1500:2400);
+  phase(1.14,-.14,lite?640:760,function(T,ph,k){sheet(T,1.14,ph,lite);tw.style.opacity=Math.max(0,k*2-1)},function(){show(name,scrollId);sheetGo=null;clearTimeout(uncoverTimer);uncoverTimer=setTimeout(uncover,lite?80:140)});
 }
-var h=(location.hash||'').slice(1);
-if(h=='lavados'||h=='adicionales')show(h);else{update();placeNav()}
+var start=viewFromLocation();
+if(start=='lavados'||start=='adicionales')show(start,null,location.hash?'replace':'stay');
+else{update();placeNav();setMeta('inicio')}
+window.addEventListener('popstate',function(){
+  var name=viewFromLocation();
+  if(name==cur)return;
+  show(name,null,'stay');
+});
 tw.style.opacity=0;
 wrap.classList.remove('over');
 wrap.style.clipPath='';

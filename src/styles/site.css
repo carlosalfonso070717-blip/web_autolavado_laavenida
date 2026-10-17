@@ -53,6 +53,7 @@ h3{font-size:clamp(1.9rem,3.4vw,2.8rem)}
 p{margin:0}
 button,input,select,textarea{font:inherit;color:inherit}
 button{background:none;border:0;padding:0}
+a[data-go]{font:inherit;color:inherit;text-decoration:none;cursor:pointer}
 
 /* skeleton: same boxes as the real cards, a slow sheen until the content arrives */
 .sk{display:block;border-radius:8px;background:linear-gradient(100deg,color-mix(in srgb,var(--line) 70%,var(--paper)) 30%,color-mix(in srgb,#fff 80%,var(--aqua)) 48%,color-mix(in srgb,var(--line) 70%,var(--paper)) 64%);background-size:220% 100%;animation:sk 1.35s ease-in-out infinite}
@@ -118,15 +119,15 @@ button{background:none;border:0;padding:0}
 .brand-name b{font:900 1.65rem/1 var(--display);letter-spacing:.02em;text-transform:uppercase}
 .brand-name small{margin-top:5px;font-size:.78rem;font-weight:600;color:var(--muted)}
 .menu{display:flex;align-items:center;gap:2px}
-.menu>button,.menu .dd>button{background:none;border:0;padding:8px 12px;border-radius:999px;font-weight:600;font-size:.92rem;white-space:nowrap;cursor:pointer;color:var(--muted);transition:color .2s,background .2s}
-.menu>button:hover,.menu .dd>button:hover{background:rgba(18,119,194,.08);color:var(--ink)}
-.menu button:hover,.menu button[aria-current="page"]{color:var(--ink)}
-.menu button[aria-current="page"]{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:8px;text-decoration-color:var(--water)}
+.menu>button,.menu>a,.menu .dd>button,.menu .dd>a{background:none;border:0;padding:8px 12px;border-radius:999px;font-weight:600;font-size:.92rem;white-space:nowrap;cursor:pointer;color:var(--muted);transition:color .2s,background .2s}
+.menu>button:hover,.menu>a:hover,.menu .dd>button:hover,.menu .dd>a:hover{background:rgba(18,119,194,.08);color:var(--ink)}
+.menu button:hover,.menu a:hover,.menu button[aria-current="page"],.menu a[aria-current="page"]{color:var(--ink)}
+.menu button[aria-current="page"],.menu a[aria-current="page"]{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:8px;text-decoration-color:var(--water)}
 .dd{position:relative}
 .dd-panel{position:absolute;top:100%;left:0;min-width:270px;padding:8px;background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;opacity:0;visibility:hidden;transform:translateY(-6px);transition:.25s var(--ease)}
 .dd:hover .dd-panel,.dd:focus-within .dd-panel{opacity:1;visibility:visible;transform:none}
-.dd-panel button{display:grid;text-align:left;padding:12px 14px;background:none;border:0;cursor:pointer;color:var(--ink)}
-.dd-panel button:hover{background:var(--tint)}
+.dd-panel button,.dd-panel a{display:grid;text-align:left;padding:12px 14px;background:none;border:0;cursor:pointer;color:var(--ink)}
+.dd-panel button:hover,.dd-panel a:hover{background:var(--tint)}
 .dd-panel b{font:800 1.35rem/1 var(--display);text-transform:uppercase}
 .dd-panel small{color:var(--muted);font-size:.85rem}
 .btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-weight:600;font-size:.98rem;padding:14px 26px;border:1.5px solid transparent;border-radius:2px;cursor:pointer;transition:transform .3s var(--ease),background .3s,color .3s,border-color .3s}
@@ -156,7 +157,7 @@ button{background:none;border:0;padding:0}
   .menu{position:fixed;top:calc(max(8px,env(safe-area-inset-top,0px)) + 62px);left:12px;right:12px;width:auto;max-height:min(72dvh,560px);overflow:auto;flex-direction:column;align-items:stretch;background:color-mix(in srgb,var(--paper) 97%,transparent);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:8px;display:none;z-index:50}
   .menu.open{display:flex}
   .dd-panel{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:0;padding:0 0 4px 8px;min-width:0;background:transparent}
-  .menu>button,.menu .dd>button{text-align:left;padding:14px 12px;font-size:1.02rem;border-radius:12px}
+  .menu>button,.menu>a,.menu .dd>button,.menu .dd>a{text-align:left;padding:14px 12px;font-size:1.02rem;border-radius:12px}
   .menu .btn{margin-top:6px;justify-content:center}
   body.nav-open{overflow:hidden}
 }
@@ -257,7 +258,7 @@ button{background:none;border:0;padding:0}
 .sub .wrap{position:relative;z-index:1;display:grid;gap:22px}
 .sub h1{font-size:clamp(2.6rem,13.5vw,13rem);font-weight:900;line-height:1.05;margin-left:-.04em}
 .crumb{display:flex;gap:10px;align-items:center;font-weight:600;font-size:.95rem}
-.crumb button{background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.crumb button,.crumb a{background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
 .sub p{font-size:clamp(1.05rem,1.5vw,1.25rem);max-width:50ch;font-weight:500}
 
 /* vehicle selector */
@@ -275,9 +276,12 @@ button{background:none;border:0;padding:0}
 .seg button{position:relative;white-space:nowrap;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:11px 18px;font-weight:700;font-size:.98rem;color:var(--ink);cursor:pointer;transition:background .25s,color .25s,border-color .25s}
 .seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
 @media(max-width:860px){
-  .vehbar{z-index:30}
-  .vehpick{position:relative;gap:12px}
-  .vehpick-btn{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:60px;padding:0 18px;background:#fff;color:var(--ink);border:1.5px solid var(--ink);border-radius:18px;box-shadow:0 16px 36px -28px rgba(8,38,63,.55);cursor:pointer;text-align:left}
+  .vehbar{position:static;top:auto;z-index:30;box-shadow:none}
+  .vehbar .wrap{padding-block:12px 14px}
+  .vehpick{position:relative;gap:8px}
+  .vehpick-k{font-size:1.05rem;letter-spacing:.08em}
+  .vehpick-note{font-size:.9rem;font-weight:500;line-height:1.35}
+  .vehpick-btn{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;padding:0 16px;background:#fff;color:var(--ink);border:1.5px solid var(--ink);border-radius:16px;cursor:pointer;text-align:left}
   .vehpick-btn span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:800 1.4rem/1 var(--display);letter-spacing:.01em;text-transform:uppercase}
   .vehpick-btn svg{width:22px;height:22px;flex:none;transition:transform .25s var(--ease)}
   .vehpick.open .vehpick-btn svg{transform:rotate(180deg)}
@@ -382,8 +386,8 @@ body:has(.bar.show) .wa-float{bottom:calc(112px + env(safe-area-inset-bottom,0px
 .foot-col h3{font:700 1.05rem/1.2 var(--body);text-transform:none;letter-spacing:0;color:#fff;margin:0 0 12px}
 .foot-col h3+h3,.foot-col .foot-social+h3{margin-top:28px}
 .foot-col h3:nth-of-type(2){margin-top:28px}
-.foot-col button,.foot-col a.foot-link{background:none;border:0;padding:7px 0;text-align:left;cursor:pointer;color:var(--on-deep-muted);font-weight:500;text-decoration:none}
-.foot-col button:hover{color:#fff}
+.foot-col button,.foot-col a.foot-link,.foot-col a[data-go]{background:none;border:0;padding:7px 0;text-align:left;cursor:pointer;color:var(--on-deep-muted);font-weight:500;text-decoration:none}
+.foot-col button:hover,.foot-col a[data-go]:hover{color:#fff}
 .foot-wa{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;padding:4px 0 8px}
 .foot-wa svg{width:28px;height:28px;flex:none}
 .foot-wa b{display:block;font:600 1rem/1.2 var(--body);letter-spacing:0;text-transform:none;color:#fff}

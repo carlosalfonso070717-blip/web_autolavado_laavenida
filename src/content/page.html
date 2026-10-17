@@ -2,25 +2,25 @@
 <div class="tword" id="tword" aria-hidden="true">La Avenida</div>
 
 <header class="topbar">
-    <button class="brand" data-go="inicio">
+    <a href="/" class="brand" data-go="inicio">
       <img src="/logo.svg" alt="Club de Autolavado La Avenida" width="76" height="76">
       <span class="brand-name"><b>La Avenida</b><small>Club de autolavado</small></span>
-    </button>
+    </a>
     <div class="nav">
     <button class="burger" id="burger" aria-expanded="false" aria-controls="menu" aria-label="Menú"><span></span></button>
     <nav class="menu" id="menu" aria-label="Principal">
-      <button data-go="inicio" data-nav="inicio">Inicio</button>
+      <a href="/" data-go="inicio" data-nav="inicio">Inicio</a>
       <div class="dd">
-        <button aria-haspopup="true" data-go="inicio" data-nav="servicios" data-scroll="servicios">Servicios</button>
+        <a href="/#servicios" aria-haspopup="true" data-go="inicio" data-nav="servicios" data-scroll="servicios">Servicios</a>
         <div class="dd-panel">
-          <button data-go="lavados"><b>Lavados</b><small>Express, Completo, Deluxe y precios especiales</small></button>
-          <button data-go="adicionales"><b>Adicionales</b><small>15 servicios de detallado, interiores y ceras</small></button>
+          <a href="/lavados" data-go="lavados"><b>Lavados</b><small>Express, Completo, Deluxe y precios especiales</small></a>
+          <a href="/adicionales" data-go="adicionales"><b>Adicionales</b><small>15 servicios de detallado, interiores y ceras</small></a>
         </div>
       </div>
-      <button data-go="inicio" data-scroll="nosotros">Quiénes somos</button>
-      <button data-go="inicio" data-scroll="info">Horarios y ubicación</button>
-      <button data-go="inicio" data-scroll="faq">Preguntas</button>
-      <button class="btn btn--main btn--sm" data-go="inicio" data-scroll="contacto"><span>Contacto</span></button>
+      <a href="/#nosotros" data-go="inicio" data-scroll="nosotros">Quiénes somos</a>
+      <a href="/#info" data-go="inicio" data-scroll="info">Horarios y ubicación</a>
+      <a href="/#faq" data-go="inicio" data-scroll="faq">Preguntas</a>
+      <a href="/#contacto" class="btn btn--main btn--sm" data-go="inicio" data-scroll="contacto"><span>Contacto</span></a>
     </nav>
     </div>
 </header>
@@ -34,8 +34,8 @@
       <p>Somos los encargados de que tu auto brille como el primer día.</p>
     </div>
     <div class="cta">
-      <button class="btn btn--main" data-go="lavados"><span>Ver lavados</span></button>
-      <button class="btn btn--line" data-go="adicionales"><span>Servicios adicionales</span></button>
+      <a href="/lavados" class="btn btn--main" data-go="lavados"><span>Ver lavados</span></a>
+      <a href="/adicionales" class="btn btn--line" data-go="adicionales"><span>Servicios adicionales</span></a>
     </div>
   </section>
 
@@ -70,7 +70,7 @@
         <p class="lead">Elige un lavado según lo que necesite tu vehículo y súmale los servicios adicionales que quieras.</p>
       </div>
       <div class="panels">
-        <button class="panel panel--deep" data-go="lavados">
+        <a href="/lavados" class="panel panel--deep" data-go="lavados">
           <h3>Lavados</h3><div class="panel-body">
           <ul>
             <li><span>Express</span><span>desde $100.00</span></li>
@@ -78,8 +78,8 @@
             <li><span>Deluxe</span><span>desde $340.00</span></li>
             <li><span>Uber Special y Happy Hour</span><span>desde $100.00</span></li>
           </ul><div class="panel-top"><span>Ver los cinco lavados</span><span class="arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></div>
-        </button>
-        <button class="panel panel--pale" data-go="adicionales">
+        </a>
+        <a href="/adicionales" class="panel panel--pale" data-go="adicionales">
           <h3>Adicionales</h3><div class="panel-body">
           <ul>
             <li><span>Motor, pintura, rines y faros</span><span>desde $200.00</span></li>
@@ -87,7 +87,7 @@
             <li><span>Shampoo de interiores</span><span>desde $100.00</span></li>
             <li><span>Ceras</span><span>desde $150.00</span></li>
           </ul><div class="panel-top"><span>Ver los quince servicios</span><span class="arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></div>
-        </button>
+        </a>
       </div>
     </div></section>
 
@@ -204,7 +204,7 @@
 <!-- ============ LAVADOS ============ -->
 <main class="page" data-view="lavados" hidden>
   <section class="sub"><div class="wrap">
-    <div class="crumb"><button data-go="inicio">Inicio</button><span>/</span><span>Servicios</span><span>/</span><span>Lavados</span></div>
+    <div class="crumb"><a href="/" data-go="inicio">Inicio</a><span>/</span><span>Servicios</span><span>/</span><span>Lavados</span></div>
     <h1>Lavados</h1>
     <p>Cinco opciones. Elige tu tipo de vehículo y los precios se ajustan.</p>
   </div></section>
@@ -227,7 +227,7 @@
     </div></section>
     <section class="band"><div class="wrap next">
       <h2>Súmale algo más</h2>
-      <button class="btn btn--main" data-go="adicionales"><span>Ver servicios adicionales</span></button>
+      <a href="/adicionales" class="btn btn--main" data-go="adicionales"><span>Ver servicios adicionales</span></a>
     </div></section>
   </div>
 </main>
@@ -235,7 +235,7 @@
 <!-- ============ ADICIONALES ============ -->
 <main class="page" data-view="adicionales" hidden>
   <section class="sub"><div class="wrap">
-    <div class="crumb"><button data-go="inicio">Inicio</button><span>/</span><span>Servicios</span><span>/</span><span>Adicionales</span></div>
+    <div class="crumb"><a href="/" data-go="inicio">Inicio</a><span>/</span><span>Servicios</span><span>/</span><span>Adicionales</span></div>
     <h1>Adicionales</h1>
     <p>Quince servicios de detallado. Marca los que quieras y ve sumando el total.</p>
   </div></section>
@@ -249,7 +249,7 @@
     </div>
     <section class="band"><div class="wrap next">
       <h2>¿Aún no eliges lavado?</h2>
-      <button class="btn btn--main" data-go="lavados"><span>Ver lavados</span></button>
+      <a href="/lavados" class="btn btn--main" data-go="lavados"><span>Ver lavados</span></a>
     </div></section>
   </div>
 </main>
@@ -265,18 +265,18 @@
     </div>
     <nav class="foot-col" aria-label="Enlaces rápidos">
       <h3>Enlaces rápidos</h3>
-      <button data-go="inicio">Inicio</button>
-      <button data-go="lavados">Lavados</button>
-      <button data-go="adicionales">Adicionales</button>
-      <button data-go="inicio" data-scroll="nosotros">Quiénes somos</button>
-      <button data-go="inicio" data-scroll="info">Horarios y ubicación</button>
-      <button data-go="inicio" data-scroll="faq">Preguntas</button>
-      <button data-go="inicio" data-scroll="contacto">Contacto</button>
+      <a href="/" data-go="inicio">Inicio</a>
+      <a href="/lavados" data-go="lavados">Lavados</a>
+      <a href="/adicionales" data-go="adicionales">Adicionales</a>
+      <a href="/#nosotros" data-go="inicio" data-scroll="nosotros">Quiénes somos</a>
+      <a href="/#info" data-go="inicio" data-scroll="info">Horarios y ubicación</a>
+      <a href="/#faq" data-go="inicio" data-scroll="faq">Preguntas</a>
+      <a href="/#contacto" data-go="inicio" data-scroll="contacto">Contacto</a>
     </nav>
     <nav class="foot-col" aria-label="Nuestros servicios">
       <h3>Nuestros servicios</h3>
-      <button data-go="lavados">Lavados</button>
-      <button data-go="adicionales">Servicios adicionales</button>
+      <a href="/lavados" data-go="lavados">Lavados</a>
+      <a href="/adicionales" data-go="adicionales">Servicios adicionales</a>
     </nav>
     <div class="foot-col">
       <h3>Contacto</h3>

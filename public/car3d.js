@@ -136,21 +136,22 @@ function wheelParts(car){
     g.position.set(s*.62,.36,z+(front?.02:-.02));g.rotation.z=s*.32;car.add(g)});
 }
 
-/* ---------- hand tools (no people). On a phone the car only turns; these meshes are what freeze the page. ---------- */
-if(!lite){
+/* ---------- hand tools (no people). On a phone they are built after the car is already on screen. ---------- */
+var washOn=!lite,spray,gun,hose,bottle,jet,puff,mist,sponge,towelA,towelB,bottleG,spritz,spritzMat,seed,XAX,zgeo,zp,NZ2,A,B,D,UPV,SIDE,HN;
+function buildWashTools(){
 var dark=new T.MeshStandardMaterial({color:0x14181d,roughness:.45,metalness:.3}),steel=new T.MeshStandardMaterial({color:0xc2c8cd,roughness:.2,metalness:1}),blue=new T.MeshStandardMaterial({color:0x1f86d1,roughness:.4,metalness:.2}),rubber=new T.MeshStandardMaterial({color:0x0c0d0f,roughness:.8,metalness:0});
 function part(g,m,x,y,z,rx){var o=new T.Mesh(g,m);o.position.set(x,y,z);if(rx)o.rotation.x=rx;o.renderOrder=6;return o}
-var gun=new T.Group(),H=Math.PI/2;
+gun=new T.Group();var H=Math.PI/2;
 gun.add(part(new T.CapsuleGeometry(.038,.19,6,16),dark,0,0,-.05,H));gun.add(part(new T.CapsuleGeometry(.028,.15,6,14),rubber,0,-.13,-.14,.42));
 gun.add(part(new T.TorusGeometry(.04,.006,8,20,Math.PI),dark,0,-.06,-.04,0));
 gun.add(part(new T.CylinderGeometry(.0105,.0105,.6,14),steel,0,.005,.4,H));gun.add(part(new T.CylinderGeometry(.021,.025,.07,18),blue,0,.005,.12,H));
 gun.add(part(new T.CylinderGeometry(.016,.016,.05,14),steel,0,.005,.69,H));gun.add(part(new T.CylinderGeometry(.013,.022,.07,18),dark,0,.005,.745,H));
-var bottle=new T.Group();bottle.add(part(new T.CylinderGeometry(.048,.05,.15,24),new T.MeshPhysicalMaterial({color:0xf4f8fb,roughness:.2,transparent:true,opacity:.88,clearcoat:1}),0,-.11,.66));
+bottle=new T.Group();bottle.add(part(new T.CylinderGeometry(.048,.05,.15,24),new T.MeshPhysicalMaterial({color:0xf4f8fb,roughness:.2,transparent:true,opacity:.88,clearcoat:1}),0,-.11,.66));
 bottle.add(part(new T.CylinderGeometry(.03,.034,.045,18),blue,0,-.018,.66));gun.add(bottle);gun.visible=false;scene.add(gun);
 gun.traverse(function(o){if(o.geometry&&o.geometry.type=='TorusGeometry')o.rotation.y=H});
 var HP=[new T.Vector3(0,.4,-.2),new T.Vector3(.2,.2,.2),new T.Vector3(.6,.05,.8),new T.Vector3(1.2,.04,1.6),new T.Vector3(2,.03,3.2)],hcurve=new T.CatmullRomCurve3(HP);
 var hoseSeg=18,hoseRadN=5,hoseRadius=.012,hoseGeo=new T.TubeGeometry(hcurve,hoseSeg,hoseRadius,hoseRadN);
-var hose=new T.Mesh(hoseGeo,rubber);hose.renderOrder=6;hose.frustumCulled=false;hose.visible=false;scene.add(hose);
+hose=new T.Mesh(hoseGeo,rubber);hose.renderOrder=6;hose.frustumCulled=false;hose.visible=false;scene.add(hose);
 var hoseP=new T.Vector3(),hoseNrm=new T.Vector3(),hoseVtx=new T.Vector3();
 function hoseStep(){hcurve.needsUpdate=true;HP[0].set(0,-.24,-.17).applyMatrix4(gun.matrixWorld);var g=gun.position;HP[1].set(HP[0].x+.06,Math.max(.25,HP[0].y-.45),HP[0].z+.08);HP[2].set(g.x+.3,.03,g.z+.55);HP[3].set(g.x+.9,.025,g.z+1.7);HP[4].set(g.x+1.6,.025,g.z+4.2);
   var frames=hcurve.computeFrenetFrames(hoseSeg,false),pos=hoseGeo.attributes.position,nrm=hoseGeo.attributes.normal,i,j,v,theta,sin,cos,N,B;
@@ -160,17 +161,17 @@ function hoseStep(){hcurve.needsUpdate=true;HP[0].set(0,-.24,-.17).applyMatrix4(
       hoseVtx.copy(hoseP).addScaledVector(hoseNrm,hoseRadius);pos.setXYZ(v,hoseVtx.x,hoseVtx.y,hoseVtx.z);nrm.setXYZ(v,hoseNrm.x,hoseNrm.y,hoseNrm.z)}}
   pos.needsUpdate=true;nrm.needsUpdate=true}
 
-var NS=lite?280:640,sp=new Float32Array(NS*6),sc=new Float32Array(NS*6),seed=[];
+var NS=lite?180:640,sp=new Float32Array(NS*6),sc=new Float32Array(NS*6);seed=[];
 for(i=0;i<NS;i++)seed.push({a:(Math.random()*2-1),b:(Math.random()*2-1),ph:Math.random(),v:.8+Math.random()*.6});
 var sgeo=new T.BufferGeometry();sgeo.setAttribute('position',new T.BufferAttribute(sp,3));sgeo.setAttribute('color',new T.BufferAttribute(sc,3));
-var jet=new T.LineSegments(sgeo,new T.LineBasicMaterial({vertexColors:true,transparent:true,opacity:1,depthWrite:false,blending:T.AdditiveBlending}));jet.frustumCulled=false;jet.renderOrder=7;scene.add(jet);
+jet=new T.LineSegments(sgeo,new T.LineBasicMaterial({vertexColors:true,transparent:true,opacity:1,depthWrite:false,blending:T.AdditiveBlending}));jet.frustumCulled=false;jet.renderOrder=7;scene.add(jet);
 var NP=lite?120:280,pp=new Float32Array(NP*3),pgeo=new T.BufferGeometry();pgeo.setAttribute('position',new T.BufferAttribute(pp,3));
 var puffMat=new T.PointsMaterial({size:.15,map:soft,transparent:true,opacity:.5,depthWrite:false,color:0xffffff});
-var puff=new T.Points(pgeo,puffMat);puff.frustumCulled=false;puff.renderOrder=7;scene.add(puff);
+puff=new T.Points(pgeo,puffMat);puff.frustumCulled=false;puff.renderOrder=7;scene.add(puff);
 var NM2=22,mistMat=new T.PointsMaterial({size:.34,map:soft,transparent:true,opacity:.1,depthWrite:false,blending:T.AdditiveBlending,color:0xd6ebf8}),mgeo=new T.BufferGeometry(),mpos=new Float32Array(NM2*3);
-mgeo.setAttribute('position',new T.BufferAttribute(mpos,3));var mist=new T.Points(mgeo,mistMat);mist.frustumCulled=false;mist.renderOrder=7;scene.add(mist);
-var A=new T.Vector3(),B=new T.Vector3(),D=new T.Vector3(),UPV=new T.Vector3(0,1,0),SIDE=new T.Vector3(),HN=new T.Vector3(1,0,0);
-function spray(t,foam,k){
+mgeo.setAttribute('position',new T.BufferAttribute(mpos,3));mist=new T.Points(mgeo,mistMat);mist.frustumCulled=false;mist.renderOrder=7;scene.add(mist);
+A=new T.Vector3();B=new T.Vector3();D=new T.Vector3();UPV=new T.Vector3(0,1,0);SIDE=new T.Vector3();HN=new T.Vector3(1,0,0);
+spray=function(t,foam,k){
   D.copy(B).sub(A);var len=D.length();D.normalize();SIDE.crossVectors(D,UPV).normalize();
   jet.visible=!foam&&k>.01;puff.visible=foam&&k>.01;mist.visible=k>.01;
   var n,s,q,o,br,q2;
@@ -187,10 +188,10 @@ function spray(t,foam,k){
 /* soft pads: sponge and folded microfibre towels */
 function pad(sx,sy,sz,pw,wr,mat){var g=new T.SphereGeometry(1,36,22),p=g.attributes.position;for(var i=0;i<p.count;i++){var x=p.getX(i),y=p.getY(i),z=p.getZ(i),X=Math.sign(x)*Math.pow(Math.abs(x),pw)*sx,Y=Math.sign(y)*Math.pow(Math.abs(y),pw)*sy,Z=Math.sign(z)*Math.pow(Math.abs(z),pw)*sz;
   Z+=wr*(Math.sin(X*46+Y*17)+.7*Math.sin(Y*61-X*23))*(z>0?1:.2);p.setXYZ(i,X,Y,Z)}g.computeVertexNormals();var m=new T.Mesh(g,mat);m.renderOrder=6;m.visible=false;m.userData={tp:new T.Vector3(),tq:new T.Quaternion(),hit:new T.Vector3(),ok:false,fresh:true};scene.add(m);return m}
-var sponge=pad(.115,.075,.036,.5,.0012,new T.MeshStandardMaterial({color:0xe8b41c,roughness:.97,metalness:0}));
-var towelA=pad(.17,.115,.014,.42,.0035,new T.MeshStandardMaterial({color:0x2a78b8,roughness:1,metalness:0})),towelB=pad(.17,.115,.014,.42,.0035,new T.MeshStandardMaterial({color:0xcfd6dc,roughness:1,metalness:0}));
+sponge=pad(.115,.075,.036,.5,.0012,new T.MeshStandardMaterial({color:0xe8b41c,roughness:.97,metalness:0}));
+towelA=pad(.17,.115,.014,.42,.0035,new T.MeshStandardMaterial({color:0x2a78b8,roughness:1,metalness:0}));towelB=pad(.17,.115,.014,.42,.0035,new T.MeshStandardMaterial({color:0xcfd6dc,roughness:1,metalness:0}));
 /* trigger spray bottle with blue tyre dressing */
-var bottleG=new T.Group();(function(){
+bottleG=new T.Group();(function(){
   function lathe(p,m){var g=new T.LatheGeometry(p.map(function(a){return new T.Vector2(a[0],a[1])}),36);var o=new T.Mesh(g,m);o.scale.z=.72;o.renderOrder=6;bottleG.add(o);return o}
   lathe([[0,.004],[.039,.004],[.0395,.088],[.032,.128],[.02,.15],[0,.15]],new T.MeshPhysicalMaterial({color:0x1586d6,roughness:.08,transparent:true,opacity:.9,clearcoat:1,envMapIntensity:1.3}));
   lathe([[0,0],[.04,0],[.0435,.01],[.0435,.09],[.036,.132],[.022,.162],[.0145,.176],[.0145,.192]],new T.MeshPhysicalMaterial({color:0xd9f1ff,roughness:.04,transparent:true,opacity:.3,clearcoat:1,envMapIntensity:1.6,depthWrite:false,side:T.DoubleSide})).renderOrder=7;
@@ -200,10 +201,12 @@ var bottleG=new T.Group();(function(){
   bottleG.add(part(new T.CylinderGeometry(.0085,.0085,.016,14),navy,0,.234,.061,H));bottleG.add(part(new T.BoxGeometry(.009,.056,.013),navy,0,.196,.038,-.38));
   bottleG.scale.setScalar(1.3);bottleG.visible=false;scene.add(bottleG);bottleG.userData={tp:new T.Vector3(),fresh:true};
 })();
-var NZ2=70,zp=new Float32Array(NZ2*3),zgeo=new T.BufferGeometry();zgeo.setAttribute('position',new T.BufferAttribute(zp,3));
-var spritzMat=new T.PointsMaterial({size:.06,map:soft,transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending,color:0xcfe9fb}),spritz=new T.Points(zgeo,spritzMat);spritz.frustumCulled=false;spritz.renderOrder=7;spritz.visible=false;scene.add(spritz);
-var XAX=new T.Vector3(1,0,0);
+NZ2=70;zp=new Float32Array(NZ2*3);zgeo=new T.BufferGeometry();zgeo.setAttribute('position',new T.BufferAttribute(zp,3));
+spritzMat=new T.PointsMaterial({size:.06,map:soft,transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending,color:0xcfe9fb});spritz=new T.Points(zgeo,spritzMat);spritz.frustumCulled=false;spritz.renderOrder=7;spritz.visible=false;scene.add(spritz);
+XAX=new T.Vector3(1,0,0);
+if(lite){gun.scale.setScalar(2.3);bottle.scale.setScalar(1.7);bottleG.scale.multiplyScalar(1.8);puffMat.size=.5;mistMat.size=.75;spritzMat.size=.14}
 }
+if(!lite)buildWashTools();
 /* tools ride on the real bodywork: cast a ray at the body, then glide toward the hit so the motion stays fluid */
 var ray=new T.Raycaster(),bodyMesh=null,hitList=[],NM=new T.Matrix3(),ZAX=new T.Vector3(0,0,1),QN=new T.Quaternion(),QS=new T.Quaternion(),O=new T.Vector3(),DIR=new T.Vector3(),N=new T.Vector3(),DT=1,castAcc=0,allowCast=true;
 function cast(o,d){ray.set(o,d);var h=ray.intersectObjects(hitList,false)[0];if(!h)return null;N.copy(h.face.normal);if(h.object===bodyMesh)N.applyMatrix3(NM);N.normalize();if(N.dot(d)>0)N.negate();return h}
@@ -226,13 +229,14 @@ function liteFrame(){
   var th=Math.PI/2+.16*Math.sin(clock*.4),s=Math.abs(Math.sin(th)),c=Math.abs(Math.cos(th));
   var ox=carCenter.x,oy=carCenter.y*.72,oz=carCenter.z,halfW=carSize.z*.5*s+carSize.x*.5*c,halfH=carSize.y*.55;
   if(bodyBox){ox=(bodyBox.min.x+bodyBox.max.x)*.5;oy=(bodyBox.min.y+bodyBox.max.y)*.5;oz=(bodyBox.min.z+bodyBox.max.z)*.5;halfW=(bodyBox.max.z-bodyBox.min.z)*.5*s+(bodyBox.max.x-bodyBox.min.x)*.5*c;halfH=(bodyBox.max.y-bodyBox.min.y)*.5}
-  var dist=Math.max(halfW/Math.tan(hFov/2),halfH/Math.tan(vFov/2))*1.18;
+  var dist=Math.max(halfW/Math.tan(hFov/2),halfH/Math.tan(vFov/2))*(washOn?1.36:1.16);
   cam.position.set(ox+Math.sin(th)*dist,oy+halfH*.2,oz+Math.cos(th)*dist);
   cam.lookAt(ox,oy,oz);
+  viewEdge=dist*Math.tan(hFov/2)*.82;
   renderer.render(scene,cam);
 }
 function frame(t){
-  if(lite){liteFrame();return}
+  if(lite&&!washOn){liteFrame();return}
   castAcc+=DT;allowCast=castAcc>(lite?.05:.033);if(allowCast)castAcc=0;
   var ph=0;while(ph<7&&t>=CUT[ph+1])ph++;
   var u=(t-CUT[ph])/(CUT[ph+1]-CUT[ph]),e=sm(u),back=sm((t-(LOOP-2.4))/2.4),io=sm(u*7)*sm((1-u)*7),sweep=ZS-2*ZS*e,n;
@@ -249,7 +253,7 @@ function frame(t){
   else{d.set(back,back);f.set(0,0);w.set(0,0)}
   /* pressure washer: aim along the car, end the jet exactly where it meets the bodywork */
   var useGun=ph==1||ph==2||ph==4;gun.visible=useGun;hose.visible=false;bottle.visible=ph==2;
-  if(useGun){var enter=1-io;gun.position.set(2.25+enter*.55,1.12+.14*Math.sin(clock*1.3)+enter*.4,sweep+.55+enter*viewEdge);B.set(.2,.6+.4*Math.sin(clock*2.2),sweep-.12);gun.lookAt(B);gun.updateMatrixWorld(true);
+  if(useGun){var enter=1-io,gx=lite?1.42:2.25;gun.position.set(gx+enter*(lite?.22:.55),(lite?.92:1.12)+.14*Math.sin(clock*1.3)+enter*(lite?.12:.4),sweep+.55+enter*(lite?Math.min(viewEdge,.35):viewEdge));B.set(lite?.55:.2,.6+.4*Math.sin(clock*2.2),sweep-.12);gun.lookAt(B);gun.updateMatrixWorld(true);
     A.set(0,.005,.78).applyMatrix4(gun.matrixWorld);DIR.copy(B).sub(A).normalize();HN.set(1,0,0);
     if(allowCast){var gh=hitList.length?cast(A,DIR):null;if(gh){B.copy(gh.point);HN.copy(N)}}
     spray(clock,ph==2,io)}
@@ -259,12 +263,12 @@ function frame(t){
   sponge.visible=ph==3;
   if(ph==3){var a=clock*3.1,top=u>.52,q=top?(u-.52)/.48:u/.52,zc=top?-1.95+3.9*sm(q):1.95-3.9*sm(q);
     if(top)ride(sponge,true,.42*Math.sin(a),zc+.2*Math.sin(2*a),.03,.35*Math.sin(a));else ride(sponge,false,.6+.17*Math.sin(2*a+.5),zc+.3*Math.sin(a),.03,.35*Math.sin(a));
-    sponge.scale.setScalar(.25+.75*sm(u*12)*sm((1-u)*12));sponge.position.z+=(1-sm(Math.min(1,u*5)))*viewEdge;if(mk)mark(sponge)}
+    sponge.scale.setScalar((lite?2.6:1)*(.25+.75*sm(u*12)*sm((1-u)*12)));sponge.position.z+=(1-sm(Math.min(1,u*5)))*viewEdge;if(mk)mark(sponge)}
   /* towels: long S-strokes just ahead of the dry line; the water film and beads disappear under them */
   towelA.visible=ph==5||ph==6;towelB.visible=ph==5;
   if(ph==5){var a5=clock*2.5,lead=sweep-.15,s5=.25+.75*sm(u*10)*sm((1-u)*10);
     ride(towelA,false,.62+.2*Math.sin(2*a5+1),lead+.36*Math.sin(a5),.016,.3*Math.sin(a5));ride(towelB,true,.44*Math.sin(a5*.9+1),lead+.26*Math.sin(1.8*a5),.016,.3*Math.cos(a5));
-    towelA.scale.setScalar(s5);towelB.scale.setScalar(s5);if(mk){mark(towelA);mark(towelB)}}
+    towelA.scale.setScalar((lite?2.4:1)*s5);towelB.scale.setScalar((lite?2.4:1)*s5);if(mk){mark(towelA);mark(towelB)}}
   /* tyre dressing: the bottle circles each wheel spraying, a towel follows spreading it, and the sidewall turns glossy behind them */
   bottleG.visible=spritz.visible=ph==6;
   if(ph==6){var rear=u<.5,q6=rear?u/.5:(u-.5)/.5,zc6=rear?1.496:-1.155,pr6=sm(q6*1.12-.04),wa6=(pr6-.5)*6.2832,io6=sm(q6*9)*sm((1-q6)*9),bd=bottleG.userData;
@@ -278,6 +282,7 @@ function frame(t){
     var k7=ud6.fresh||DT>=1?1:1-Math.exp(-DT*11);ud6.fresh=false;towelA.position.lerp(ud6.tp,k7);towelA.quaternion.slerp(ud6.tq,k7);towelA.scale.setScalar(.44*(.3+.7*io6))}
   else U.uTyre.value.setScalar(ph==7?1-back:0);
   var g=ph==7?sm(u*3)*(1-back):0;U.uGloss.value=g;roofMat.roughness=bodyMat.roughness=.42-.2*g;roofMat.envMapIntensity=bodyMat.envMapIntensity=1.25+.35*g;
+  if(lite){liteFrame();return}
   var box=stageBox(),ow=box?box.ow:host.clientWidth,oh=box?box.oh:host.clientHeight,rw=box?box.rw:ow,rh=box?box.rh:oh;
   var asp=ow/Math.max(oh,1),vFov=cam.fov*Math.PI/180,hFov=2*Math.atan(Math.tan(vFov/2)*Math.max(asp,.2));
   var th=Math.PI/2+.22*Math.sin(clock*.1),s=Math.abs(Math.sin(th)),c=Math.abs(Math.cos(th));
@@ -355,6 +360,7 @@ function onModel(gltf){
     try{frame(calm?LOOP-5:0)}catch(err){}
     host.classList.add('ready');
     if(!calm)play(seen&&!document.hidden);
+    if(lite)setTimeout(function(){if(washOn)return;buildWashTools();washOn=true},900);
   }
   function warmStep(){
     try{lastPh=-1;frame(warm[wi])}catch(err){}

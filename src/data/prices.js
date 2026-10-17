@@ -61,9 +61,9 @@ export const washes = [
     name: 'Happy Hour Express',
     special: true,
     prices: [null, 100, 100, 120, 150],
-    summary: 'Express a precio reducido, de 2:00 p. m. a 5:00 p. m.',
-    description: 'El lavado Express a precio reducido. Aplicable solo en el horario de 2:00 p. m. a 5:00 p. m.',
-    includes: ['Solo de 2:00 p. m. a 5:00 p. m.'],
+    summary: 'Express a precio reducido, de 2:00 PM a 5:00 PM',
+    description: 'El lavado Express a precio reducido. Aplicable solo en el horario de 2:00 PM a 5:00 PM',
+    includes: ['Solo de 2:00 PM a 5:00 PM'],
   },
 ]
 
@@ -73,7 +73,7 @@ export const highlights = [
     text: 'Lavado exterior, rines y secado a mano',
   },
   {
-    title: 'Happy Hour de 2:00 p. m. a 5:00 p. m.',
+    title: 'Happy Hour de 2:00 PM a 5:00 PM',
     text: 'Express para sedán y SUV mediano a $100.00',
   },
   {

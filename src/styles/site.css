@@ -99,7 +99,7 @@ a[data-go]{font:inherit;color:inherit;text-decoration:none;cursor:pointer}
 #water{position:absolute;inset:0;width:100%;height:100%;background:linear-gradient(180deg,var(--w-hi),var(--w-lo))}
 .page{position:relative;z-index:1;background:transparent;max-width:100%;overflow-x:clip}
 .solid{background:var(--bg);position:relative}
-.band{padding-block:clamp(88px,12vw,148px)}
+.band{padding-block:clamp(64px,8.5vw,112px)}
 .band+.band{border-top:1px solid var(--hair)}
 
 /* water curtain between pages */
@@ -479,7 +479,7 @@ footer .wrap{display:grid;gap:24px}
 .hrs{border-top:2px solid var(--ink)}
 .hrs div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:20px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 .hrs b{font-weight:600}
-.hrs span{font-weight:600}
+.hrs span{font-weight:600;white-space:nowrap}
 .hrs .closed{color:var(--muted);font-weight:500}
 .place .btn{align-self:flex-start}
 .map{position:relative;min-height:320px;height:100%;overflow:hidden;border:1px solid var(--line);border-radius:28px;background:var(--tint);box-shadow:var(--shadow)}
@@ -505,7 +505,7 @@ footer .wrap{display:grid;gap:24px}
 .q[aria-expanded="true"]+.a{grid-template-rows:1fr}
 
 /* contact */
-.contact{position:relative;background:var(--bg);color:var(--ink);padding-block:clamp(72px,9vw,112px)}
+.contact{position:relative;background:var(--bg);color:var(--ink);padding-block:clamp(56px,7vw,88px)}
 .contact-top{display:flex;justify-content:space-between;align-items:flex-end;gap:28px 80px;margin-bottom:clamp(36px,5vw,56px)}
 @media(max-width:720px){.contact-top{flex-direction:column;align-items:flex-start;gap:18px}}
 .contact-k{margin:0 0 12px;font:700 .78rem/1 var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--water)}
@@ -561,7 +561,7 @@ footer .wrap{display:grid;gap:24px}
   .vals{margin-top:36px}
   .info{gap:22px}
   .faq-head h2,.contact h2{font-size:clamp(2.8rem,14vw,4.2rem)}
-  .contact{padding-block:72px 88px}
+  .contact{padding-block:52px 64px}
   .form{padding:28px 22px;gap:26px}
   .wa-float{right:16px}  footer{padding-block:28px 36px}
   .bar{padding:0 10px calc(10px + env(safe-area-inset-bottom,0px))}

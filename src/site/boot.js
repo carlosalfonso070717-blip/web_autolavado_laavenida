@@ -17,7 +17,7 @@ var WASH=[
   {n:'Completo',p:[null,190,220,250,320],d:'Suma el interior al Express.',i:['Lavado exterior','Rines y salpicadera','Secado a mano con microfibra','Aspirado','Consola y paneles','Cristales y plásticos','Abrillantado de llantas']},
   {n:'Deluxe',p:[null,340,370,400,450],d:'El Completo, con cera líquida.',i:['Todo lo del Completo','Cera líquida']},
   {n:'Uber Special',p:[null,120,160,170,200],d:'Válido únicamente presentando comprobante vigente de la plataforma.',i:['Lavado exterior','Aspirado interior'],sp:1},
-  {n:'Happy Hour Express',p:[null,100,100,120,150],d:'El lavado Express a precio reducido. Aplicable solo en el horario de 2:00 p. m. a 5:00 p. m.',i:['Solo de 2:00 p. m. a 5:00 p. m.'],sp:1}];
+  {n:'Happy Hour Express',p:[null,100,100,120,150],d:'El lavado Express a precio reducido. Aplicable solo en el horario de 2:00 PM a 5:00 PM',i:['Solo de 2:00 PM a 5:00 PM'],sp:1}];
 var CATS=[
  {t:'Exterior',s:'Motor, pintura, rines y faros.',x:[
   ['Lavado de motor','',[400,500,600,600]],
@@ -142,8 +142,8 @@ function show(name,scrollId,mode){
   placeNav();
 }
 var PAGES={
-  inicio:{path:'/',title:'Club de Autolavado La Avenida | Campestre, Yucatán',desc:'Club de Autolavado La Avenida en Campestre, Yucatán. Lavado a mano, secado con microfibra y detallado. Lunes a sábado de 8:00 a. m. a 5:00 p. m.'},
-  lavados:{path:'/lavados',title:'Lavados | Club de Autolavado La Avenida',desc:'Lavado Express, Completo y Deluxe en Campestre, Yucatán. El precio cambia según tu vehículo. Lunes a sábado de 8:00 a. m. a 5:00 p. m.'},
+  inicio:{path:'/',title:'Club de Autolavado La Avenida | Campestre, Yucatán',desc:'Club de Autolavado La Avenida en Campestre, Yucatán. Lavado a mano, secado con microfibra y detallado. Lunes a sábado de 8:00 AM a 5:00 PM'},
+  lavados:{path:'/lavados',title:'Lavados | Club de Autolavado La Avenida',desc:'Lavado Express, Completo y Deluxe en Campestre, Yucatán. El precio cambia según tu vehículo. Lunes a sábado de 8:00 AM a 5:00 PM'},
   adicionales:{path:'/adicionales',title:'Servicios adicionales | Club de Autolavado La Avenida',desc:'Quince servicios de detallado, interiores y ceras en Campestre, Yucatán. Súmalos al lavado y ve el total según tu vehículo.'}
 };
 function viewFromLocation(){
@@ -262,7 +262,7 @@ var FAQ=[
  ['¿Qué incluye el lavado Completo?','Lavado exterior, descontaminado, desengrasado de rines, salpicadera, secado a mano con toallas de microfibra, aspirado, limpieza de consola, paneles de puerta, cristales, plásticos interiores, plásticos exteriores y abrillantado de llantas.'],
  ['¿Cuál es la diferencia entre el Completo y el Deluxe?','El Deluxe incluye todo lo del Completo y añade una aplicación de cera líquida, que realza el brillo y ayuda a repeler polvo y agua.'],
  ['¿Puedo agregar servicios adicionales a cualquier lavado?','Sí. En la página de adicionales puedes marcar los que quieras y ver el total según tu vehículo antes de pedirlo.'],
- ['¿Cómo funciona el Happy Hour?','De 2:00 p. m. a 5:00 p. m. el lavado Express tiene precio reducido: $100.00 para sedán y SUV mediano, $120.00 para SUV grande y $150.00 para XL SUV. Aplica solo en ese horario.']];
+ ['¿Cómo funciona el Happy Hour?','De 2:00 PM a 5:00 PM el lavado Express tiene precio reducido: $100.00 para sedán y SUV mediano, $120.00 para SUV grande y $150.00 para XL SUV. Aplica solo en ese horario.']];
 $('#qs').innerHTML=FAQ.map(function(q,i){return '<div class="qa"><button class="q" id="q'+i+'" aria-expanded="false" aria-controls="a'+i+'"><span>'+q[0]+'</span><i></i></button><div class="a" id="a'+i+'" role="region" aria-labelledby="q'+i+'"><div><p>'+q[1]+'</p></div></div></div>'}).join('');
 $('#qs').addEventListener('click',function(e){var b=e.target.closest('.q');if(b)b.setAttribute('aria-expanded',b.getAttribute('aria-expanded')!='true')});
 function contactReady(){

@@ -8,7 +8,7 @@ const ORIGIN = 'https://clublaavenida.com.mx'
 const servicePages = {
   lavados: {
     title: 'Lavados | Club de Autolavado La Avenida',
-    desc: 'Lavado Express, Completo y Deluxe en Campestre, Yucatán. El precio cambia según tu vehículo. Lunes a sábado de 8:00 a. m. a 5:00 p. m.',
+    desc: 'Lavado Express, Completo y Deluxe en Campestre, Yucatán. El precio cambia según tu vehículo. Lunes a sábado de 8:00 AM a 5:00 PM',
   },
   adicionales: {
     title: 'Servicios adicionales | Club de Autolavado La Avenida',

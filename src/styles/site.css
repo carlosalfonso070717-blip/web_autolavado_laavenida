@@ -196,6 +196,8 @@ a.btn--line:hover{color:var(--bg)}
 .panel{position:relative;overflow:hidden;text-align:left;border:0;border-radius:28px;cursor:pointer;padding:clamp(36px,4vw,56px);display:grid;gap:36px;align-content:space-between;min-height:clamp(420px,42vw,560px);transition:transform .5s var(--ease)}
 .panel--deep{background:linear-gradient(160deg,var(--deep-2),var(--deep));color:var(--on-deep)}
 .panel--pale{background:var(--tint);color:var(--ink);border:1px solid var(--line)}
+a.panel--deep{color:var(--on-deep)}
+a.panel--pale{color:var(--ink)}
 .panel::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .6s;pointer-events:none;
   background:radial-gradient(circle,transparent 9px,var(--bub) 10px,transparent 11.5px) 0 0/130px 150px,radial-gradient(circle,transparent 4px,var(--bub) 5px,transparent 6.5px) 40px 60px/90px 110px,radial-gradient(circle,transparent 15px,var(--bub) 16px,transparent 17.5px) 70px 20px/210px 230px;
   animation:rise 9s linear infinite}

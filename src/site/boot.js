@@ -108,11 +108,11 @@ document.addEventListener('change',function(e){var id=e.target.dataset&&e.target
 function openWhatsApp(text){window.open('https://wa.me/529993394611?text='+encodeURIComponent(text),'_blank','noopener,noreferrer')}
 $('#bar-clear').addEventListener('click',function(){S.wash=null;S.extras={};$$('[data-x]').forEach(function(c){c.checked=false});update()});
 $('#bar-send').addEventListener('click',function(){
-  var ids=Object.keys(S.extras),lines=[],total=0,v=VEH[S.veh];
-  if(S.wash!=null&&WASH[S.wash].p[S.veh]!=null){total+=WASH[S.wash].p[S.veh];lines.push('Lavado '+WASH[S.wash].n)}
-  ids.forEach(function(id){total+=XALL[id][2][Math.max(S.veh,1)-1];lines.push(XALL[id][0]+(XALL[id][1]?' ('+XALL[id][1]+')':''))});
+  var ids=Object.keys(S.extras),lines=[],total=0,v=ids.length&&S.veh==0?VEH[1]:VEH[S.veh];
+  if(S.wash!=null&&WASH[S.wash].p[S.veh]!=null){var wp=WASH[S.wash].p[S.veh];total+=wp;lines.push(WASH[S.wash].n+': $'+pesos(wp))}
+  ids.forEach(function(id){var price=XALL[id][2][Math.max(S.veh,1)-1];total+=price;lines.push(XALL[id][0]+(XALL[id][1]?' ('+XALL[id][1]+')':'')+': $'+pesos(price))});
   if(!lines.length)return;
-  openWhatsApp('Hola, quiero pedir en La Avenida:\n'+lines.join('\n')+'\nVehículo: '+v.l+'\nTotal: $'+pesos(total));
+  openWhatsApp('Hola, quiero pedir en La Avenida.\n\nTipo de vehículo: '+v.l+'\n\nServicios:\n'+lines.join('\n')+'\n\nTotal: $'+pesos(total));
 });
 function closeMenu(){$('#menu').classList.remove('open');document.body.classList.remove('nav-open');var b=$('#burger');if(b)b.setAttribute('aria-expanded','false')}
 $('#burger').addEventListener('click',function(e){

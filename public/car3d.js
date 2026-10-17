@@ -82,10 +82,10 @@ function patch(m,kind){
       .replace('#include <lights_physical_fragment>','#include <lights_physical_fragment>\n#ifdef USE_CLEARCOAT\nmaterial.clearcoat*=1.-cov;\n#endif');
   };m.customProgramCacheKey=function(){return 'wash'+(kind||'')};m.needsUpdate=true;return m;
 }
-function paint(side){var sideV=side||T.FrontSide;if(lite)return new T.MeshStandardMaterial({color:0xb30508,metalness:.45,roughness:.38,side:sideV});return patch(new T.MeshPhysicalMaterial({color:0xb30508,metalness:.35,roughness:.42,clearcoat:1,clearcoatRoughness:.035,envMapIntensity:1.25,side:sideV}))}
+function paint(side){var sideV=side||T.FrontSide;var m=new T.MeshPhysicalMaterial({color:0xb30508,metalness:.35,roughness:.42,clearcoat:1,clearcoatRoughness:.035,envMapIntensity:1.25,side:sideV});return lite?m:patch(m)}
 var bodyMat=paint(),roofMat=paint(T.DoubleSide);
-var glassMat=lite?new T.MeshStandardMaterial({color:0x05080b,metalness:0,roughness:.08,transparent:true,opacity:.72}):patch(new T.MeshPhysicalMaterial({color:0x05080b,metalness:0,roughness:.03,transparent:true,opacity:.72,clearcoat:1,envMapIntensity:1.6}));
-var sideGlass=lite?new T.MeshStandardMaterial({color:0xb7c9d4,metalness:.05,roughness:.08,transparent:true,opacity:.38,side:T.DoubleSide}):patch(new T.MeshPhysicalMaterial({color:0xb7c9d4,metalness:.05,roughness:.06,transparent:true,opacity:.38,envMapIntensity:1.35,side:T.DoubleSide}));
+var glassMat=lite?new T.MeshPhysicalMaterial({color:0x05080b,metalness:0,roughness:.03,transparent:true,opacity:.72,clearcoat:1,envMapIntensity:1.6}):patch(new T.MeshPhysicalMaterial({color:0x05080b,metalness:0,roughness:.03,transparent:true,opacity:.72,clearcoat:1,envMapIntensity:1.6}));
+var sideGlass=lite?new T.MeshPhysicalMaterial({color:0xb7c9d4,metalness:.05,roughness:.06,transparent:true,opacity:.38,envMapIntensity:1.35,side:T.DoubleSide}):patch(new T.MeshPhysicalMaterial({color:0xb7c9d4,metalness:.05,roughness:.06,transparent:true,opacity:.38,envMapIntensity:1.35,side:T.DoubleSide}));
 var tyreMat=patch(new T.MeshStandardMaterial({color:0x0b0b0c,roughness:.9,metalness:0,envMapIntensity:.9}),'tyre');
 var discMat=patch(new T.MeshStandardMaterial({color:0x7c8288,roughness:.35,metalness:1,envMapIntensity:1.1}),'disc');
 var alloyMat=patch(new T.MeshStandardMaterial({color:0xa9b0b7,roughness:.2,metalness:1,envMapIntensity:1.25}));
@@ -204,7 +204,6 @@ bottleG=new T.Group();(function(){
 NZ2=70;zp=new Float32Array(NZ2*3);zgeo=new T.BufferGeometry();zgeo.setAttribute('position',new T.BufferAttribute(zp,3));
 spritzMat=new T.PointsMaterial({size:.06,map:soft,transparent:true,opacity:0,depthWrite:false,blending:T.AdditiveBlending,color:0xcfe9fb});spritz=new T.Points(zgeo,spritzMat);spritz.frustumCulled=false;spritz.renderOrder=7;spritz.visible=false;scene.add(spritz);
 XAX=new T.Vector3(1,0,0);
-if(lite){gun.scale.setScalar(2.3);bottle.scale.setScalar(1.7);bottleG.scale.multiplyScalar(1.8);puffMat.size=.5;mistMat.size=.75;spritzMat.size=.14}
 }
 if(!lite)buildWashTools();
 /* tools ride on the real bodywork: cast a ray at the body, then glide toward the hit so the motion stays fluid */
@@ -229,7 +228,7 @@ function liteFrame(){
   var th=Math.PI/2+.16*Math.sin(clock*.4),s=Math.abs(Math.sin(th)),c=Math.abs(Math.cos(th));
   var ox=carCenter.x,oy=carCenter.y*.72,oz=carCenter.z,halfW=carSize.z*.5*s+carSize.x*.5*c,halfH=carSize.y*.55;
   if(bodyBox){ox=(bodyBox.min.x+bodyBox.max.x)*.5;oy=(bodyBox.min.y+bodyBox.max.y)*.5;oz=(bodyBox.min.z+bodyBox.max.z)*.5;halfW=(bodyBox.max.z-bodyBox.min.z)*.5*s+(bodyBox.max.x-bodyBox.min.x)*.5*c;halfH=(bodyBox.max.y-bodyBox.min.y)*.5}
-  var dist=Math.max(halfW/Math.tan(hFov/2),halfH/Math.tan(vFov/2))*(washOn?1.36:1.16);
+  var dist=Math.max(halfW/Math.tan(hFov/2),halfH/Math.tan(vFov/2))*1.2;
   cam.position.set(ox+Math.sin(th)*dist,oy+halfH*.2,oz+Math.cos(th)*dist);
   cam.lookAt(ox,oy,oz);
   viewEdge=dist*Math.tan(hFov/2)*.82;
@@ -253,22 +252,22 @@ function frame(t){
   else{d.set(back,back);f.set(0,0);w.set(0,0)}
   /* pressure washer: aim along the car, end the jet exactly where it meets the bodywork */
   var useGun=ph==1||ph==2||ph==4;gun.visible=useGun;hose.visible=false;bottle.visible=ph==2;
-  if(useGun){var enter=1-io,gx=lite?1.42:2.25;gun.position.set(gx+enter*(lite?.22:.55),(lite?.92:1.12)+.14*Math.sin(clock*1.3)+enter*(lite?.12:.4),sweep+.55+enter*(lite?Math.min(viewEdge,.35):viewEdge));B.set(lite?.55:.2,.6+.4*Math.sin(clock*2.2),sweep-.12);gun.lookAt(B);gun.updateMatrixWorld(true);
+  if(useGun){var enter=1-io;gun.position.set(2.25+enter*.55,1.12+.14*Math.sin(clock*1.3)+enter*.4,sweep+.55+enter*viewEdge);B.set(.2,.6+.4*Math.sin(clock*2.2),sweep-.12);gun.lookAt(B);gun.updateMatrixWorld(true);
     A.set(0,.005,.78).applyMatrix4(gun.matrixWorld);DIR.copy(B).sub(A).normalize();HN.set(1,0,0);
-    if(allowCast){var gh=hitList.length?cast(A,DIR):null;if(gh){B.copy(gh.point);HN.copy(N)}}
+    if(allowCast){var gh=hitList.length?cast(A,DIR):null;if(gh){B.copy(gh.point);HN.copy(N);O.copy(B).addScaledVector(HN,.08).sub(A);if(O.dot(DIR)<0){gun.position.add(O);gun.updateMatrixWorld(true);A.set(0,.005,.78).applyMatrix4(gun.matrixWorld)}}}
     spray(clock,ph==2,io)}
   else{jet.visible=puff.visible=mist.visible=false}
   /* sponge: slow overlapping figure-eights along the side, then across the top; the foam thins where it has just passed */
   var mk=false;if(DT<1){tAcc+=DT;if(tAcc>.055){tAcc=0;mk=true}}
   sponge.visible=ph==3;
   if(ph==3){var a=clock*3.1,top=u>.52,q=top?(u-.52)/.48:u/.52,zc=top?-1.95+3.9*sm(q):1.95-3.9*sm(q);
-    if(top)ride(sponge,true,.42*Math.sin(a),zc+.2*Math.sin(2*a),.03,.35*Math.sin(a));else ride(sponge,false,.6+.17*Math.sin(2*a+.5),zc+.3*Math.sin(a),.03,.35*Math.sin(a));
-    sponge.scale.setScalar((lite?2.6:1)*(.25+.75*sm(u*12)*sm((1-u)*12)));sponge.position.z+=(1-sm(Math.min(1,u*5)))*viewEdge;if(mk)mark(sponge)}
+    if(top)ride(sponge,true,.42*Math.sin(a),zc+.2*Math.sin(2*a),.05,.35*Math.sin(a));else ride(sponge,false,.6+.17*Math.sin(2*a+.5),zc+.3*Math.sin(a),.05,.35*Math.sin(a));
+    sponge.scale.setScalar(.25+.75*sm(u*12)*sm((1-u)*12));sponge.position.z+=(1-sm(Math.min(1,u*5)))*viewEdge;if(mk)mark(sponge)}
   /* towels: long S-strokes just ahead of the dry line; the water film and beads disappear under them */
   towelA.visible=ph==5||ph==6;towelB.visible=ph==5;
   if(ph==5){var a5=clock*2.5,lead=sweep-.15,s5=.25+.75*sm(u*10)*sm((1-u)*10);
-    ride(towelA,false,.62+.2*Math.sin(2*a5+1),lead+.36*Math.sin(a5),.016,.3*Math.sin(a5));ride(towelB,true,.44*Math.sin(a5*.9+1),lead+.26*Math.sin(1.8*a5),.016,.3*Math.cos(a5));
-    towelA.scale.setScalar((lite?2.4:1)*s5);towelB.scale.setScalar((lite?2.4:1)*s5);if(mk){mark(towelA);mark(towelB)}}
+    ride(towelA,false,.62+.2*Math.sin(2*a5+1),lead+.36*Math.sin(a5),.03,.3*Math.sin(a5));ride(towelB,true,.44*Math.sin(a5*.9+1),lead+.26*Math.sin(1.8*a5),.03,.3*Math.cos(a5));
+    towelA.scale.setScalar(s5);towelB.scale.setScalar(s5);if(mk){mark(towelA);mark(towelB)}}
   /* tyre dressing: the bottle circles each wheel spraying, a towel follows spreading it, and the sidewall turns glossy behind them */
   bottleG.visible=spritz.visible=ph==6;
   if(ph==6){var rear=u<.5,q6=rear?u/.5:(u-.5)/.5,zc6=rear?1.496:-1.155,pr6=sm(q6*1.12-.04),wa6=(pr6-.5)*6.2832,io6=sm(q6*9)*sm((1-q6)*9),bd=bottleG.userData;
@@ -360,7 +359,7 @@ function onModel(gltf){
     try{frame(calm?LOOP-5:0)}catch(err){}
     host.classList.add('ready');
     if(!calm)play(seen&&!document.hidden);
-    if(lite)setTimeout(function(){if(washOn)return;buildWashTools();washOn=true},900);
+    if(lite)setTimeout(function(){if(washOn)return;try{wheelParts(car)}catch(err){}buildWashTools();washOn=true;setTimeout(function(){try{if(!envReady)bakeEnv()}catch(err){}},800)},900);
   }
   function warmStep(){
     try{lastPh=-1;frame(warm[wi])}catch(err){}

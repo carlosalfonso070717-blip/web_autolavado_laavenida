@@ -396,6 +396,10 @@ body:has(.bar.show) .wa-float{visibility:hidden;opacity:0;pointer-events:none}
 .foot-wa svg{width:28px;height:28px;flex:none}
 .foot-wa b{display:block;font:600 1rem/1.2 var(--body);letter-spacing:0;text-transform:none;color:#fff}
 .foot-wa small{display:block;margin-top:2px;color:var(--on-deep-muted);font-size:.86rem}
+.foot-mail{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;padding:2px 0 8px;min-width:0}
+.foot-mail svg{width:28px;height:28px;flex:none}
+.foot-mail b{display:block;font:600 .92rem/1.25 var(--body);letter-spacing:0;text-transform:none;color:#fff;overflow-wrap:anywhere}
+.foot-mail small{display:block;margin-top:2px;color:var(--on-deep-muted);font-size:.86rem}
 .foot-social{display:flex;gap:10px;margin-top:4px}
 .foot-social a{width:36px;height:36px;display:grid;place-items:center}
 .foot-social svg{width:36px;height:36px;display:block}
